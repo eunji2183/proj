@@ -1,0 +1,24 @@
+[Workflow] 
+- raw data : pair-end rna seq fastq file (CON, UPM , p5-con, p5-upm, YJ-con, YJ-upm) 
+- alignment : hisat2(2.2.0), index(grch38_tran) 
+- Gene Quantification : htseq-count(v0.11.3)/featurecounts(v2.0.0), 
+                        Reference annotation(GRCh38.96.gtf) 
+- Transcript Quantification : salmon(v1.2.1) 
+                              
+- DEG : R package  method ~ DESeq2 / EdgeR  , con_vs_upm , 
+                                              con_vs_upm (p5제외) 
+- GSEA : 
+
+[File Description]
+1.raw_fq/ : raw fastq file
+4.align/hisat2_tran : alignment 결과 , nsort.bam
+5.DEG/htseq-count,featurecounts : gene count matrix(reference :GRCh38.96.gtf)
+                                  DESeq2/EdgeR 결과, 
+                                  (volcano-plot 및 pheatmap(p.adj<0.05,FC>2)) 
+6.isoform/salmon : transcript count matrix (quant.sf)
+                   
+
+(source files)
+count.sh 
+DEG.R
+microdust.Rproj
