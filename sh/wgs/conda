@@ -1,0 +1,40 @@
+
+wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-x86_64.sh
+bash Miniconda3-latest-Linux-x86_64.sh
+## 安装过程中如果提示要输入 yes/no，就选 yes；如果有提示要按 Enter，那就按 Enter 回车键
+source ~/.bashrc
+conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/
+conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main/
+conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge/
+conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/bioconda/
+conda config --set show_channel_urls yes
+## 新建小环境 dna
+conda create -n dna python=3
+## 激活 dna 小环境
+conda activate dna
+## 安装必要的生信软件
+conda install -y sra-tools fastqc trim-galore multiqc bwa samtools gnuplot qualimap subread vcftools bedtools cnvkit 
+conda install -y -c hcc aspera-cli=3.7.7
+wget -c  https://download.asperasoft.com/download/sw/connect/3.8.1/ibm-aspera-connect-3.8.1.161274-linux-g2.12-64.tar.gz
+tar -zxvf ibm-aspera-connect-3.8.1.161274-linux-g2.12-64.tar.gz
+bash ibm-aspera-connect-3.8.1.161274-linux-g2.12-64.sh
+echo 'export PATH=~/.aspera/connect/bin/:$PATH' >> ~/.bashrc
+source ~/.bashrc
+#https://sra-explorer.info/
+#search for SRP.... - add to collection - saved dataset - Aspera commands for downloading FastQ files - copy 
+$ cat >fq_download.sh
+#!/usr/bin/env bash
+ascp -QT -l 300m -P33001 -i $HOME/.aspera/connect/etc/asperaweb_id_dsa.openssh era-fasp@fasp.sra.ebi.ac.uk:vol1/fastq/SRR318/008/SRR3182418/SRR3182418.fastq.gz . && mv SRR3182418.fastq.gz SRR3182418_exome_sequencing_of_case5_germline.fastq.gz
+ascp -QT -l 300m -P33001 -i $HOME/.aspera/connect/etc/asperaweb_id_dsa.openssh era-fasp@fasp.sra.ebi.ac.uk:vol1/fastq/SRR318/008/SRR3182418/SRR3182418_1.fastq.gz . && mv SRR3182418_1.fastq.gz SRR3182418_exome_sequencing_of_case5_germline_1.fastq.gz
+ascp -QT -l 300m -P33001 -i $HOME/.aspera/connect/etc/asperaweb_id_dsa.openssh era-fasp@fasp.sra.ebi.ac.uk:vol1/fastq/SRR318/008/SRR3182418/SRR3182418_2.fastq.gz . && mv SRR3182418_2.fastq.gz SRR3182418_exome_sequencing_of_case5_germline_2.fastq.gz
+......
+ascp -QT -l 300m -P33001 -i $HOME/.aspera/connect/etc/asperaweb_id_dsa.openssh era-fasp@fasp.sra.ebi.ac.uk:vol1/fastq/SRR318/006/SRR3182446/SRR3182446_2.fastq.gz . && mv SRR3182446_2.fastq.gz SRR3182446_exome_sequencing_of_case5_techrep_2_2.fastq.gz
+ascp -QT -l 300m -P33001 -i $HOME/.aspera/connect/etc/asperaweb_id_dsa.openssh era-fasp@fasp.sra.ebi.ac.uk:vol1/fastq/SRR318/007/SRR3182447/SRR3182447.fastq.gz . && mv SRR3182447.fastq.gz SRR3182447_exome_sequencing_of_case5_biorep_C.fastq.gz
+ascp -QT -l 300m -P33001 -i $HOME/.aspera/connect/etc/asperaweb_id_dsa.openssh era-fasp@fasp.sra.ebi.ac.uk:vol1/fastq/SRR318/007/SRR3182447/SRR3182447_1.fastq.gz . && mv SRR3182447_1.fastq.gz SRR3182447_exome_sequencing_of_case5_biorep_C_1.fastq.gz
+ascp -QT -l 300m -P33001 -i $HOME/.aspera/connect/etc/asperaweb_id_dsa.openssh era-fasp@fasp.sra.ebi.ac.uk:vol1/fastq/SRR318/007/SRR3182447/SRR3182447_2.fastq.gz . && mv SRR3182447_2.fastq.gz SRR3182447_exome_sequencing_of_case5_biorep_C_2.fastq.gz
+^C
+
+nohup bash fq_download.sh &
+find ./*gz -size 1M | xargs rm
+ls *gz | while read id; do mv ${id} ${id:31:100}; done #매개 파일이름의 31번째 글자부터 취함 
+
