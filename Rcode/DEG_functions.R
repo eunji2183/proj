@@ -53,9 +53,27 @@ DESeq2.2 <- function(count){
   return(tccRES)
 }
 
+edgeR.1 <- function(count){
+  gene_id <- rownames(count)
+  dgelist <- DGEList(counts = count,genes = gene_id,group = group)
+  dgelist_norm <- calcNormFactors(dgelist,method='TMM')
+  design <- model.matrix(~group)
+  dge <- estimateDisp(dgelist_norm,design,robust = T)
+  cpm=cpm(dgelist)
+  lcpm=cpm(dgelist,log = T)
+  et <- exactTest(dge)
+  tTags <- topTags(et,n=nrow(dgelist$counts))
+  tTags <- as.data.frame(tTags)
+  names(tTags)[1] <- 'gene_id'
+  rownames(tTags) <- NULL
+  tTag <- merge(ID,tTags,by="gene_id")
+  tTag <- tTag %>%
+    dplyr::filter(logFC != 0)
+  tTag <- tTag[order(tTag$PValue),]
+  return(tTag)
+}
 
-
-edgeR <- function(count){
+edgeR.2 <- function(count){
   suppressMessages(library(TCC))
   suppressMessages(library(edgeR))
   suppressMessages(library(dplyr))
@@ -68,3 +86,4 @@ edgeR <- function(count){
   tccRES <- dplyr::arrange(tccRES,rank)
   return(tccRES)
 }
+
