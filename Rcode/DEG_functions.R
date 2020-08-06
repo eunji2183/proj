@@ -33,7 +33,7 @@ DESeq2.1 <- function(count){
   resdata <- merge(ID,resdata,by="gene_id")
   resdata <- resdata[order(resdata$pvalue),]
   resdata$DEG <- as.factor(ifelse(resdata$padj < 0.05 & abs(resdata$log2FoldChange) > 1,
-                                  ifelse(resdata$log2FoldChange > 1 , 'Up','Down'),'not'))
+                                  ifelse(resdata$log2FoldChange > 1 , 'UP','DOWN'),'NOT'))
   
   resdata$sign <- ifelse(resdata$padj < 0.05 & abs(resdata$log2FoldChange) > 2.5,resdata$gene_name,NA)
   return(resdata)
@@ -87,3 +87,20 @@ edgeR.2 <- function(count){
   return(tccRES)
 }
 
+heatmap <- function(df){
+  suppressMessages(library(pheatmap))
+  heat <- resdata %>%
+    dplyr::select(gene_name,colnames(count))
+  heat = heat[-which(duplicated(heat$gene_name)),]
+  rownames(heat) <- heat[,1]
+  heat <- heat[,-1]
+  heat <- heat %>%
+    dplyr::filter(rownames(heat) %in% gene)
+  p <- pheatmap(heat,scale = "row", clustering_distance_row = "correlation",
+                show_colnames = T,show_rownames = T,
+                cluster_cols = T,cluster_rows = T,
+                color = colorRampPalette(c('#2471A3','white','#C0392B'))(50),
+                border_color = 'white',
+                display_numbers = F,main = "",key=T,fontsize_row = 10)
+  return(p)
+}
