@@ -59,22 +59,9 @@ gene <- c("EIF2AK3","HSPA5","ATF6","ERN1",
           "MEF2C","NFATC2","SIK1","CAMK2A","IL12RB1","CYP1A1","NQO1",
           "TNF","F2RL3","CXCR2","CCL3","XBP1","GRIA4","FPR1",
           "GCLM","HSP90B1","TXNRD1","CALR","CRELD2")
+heatmap(df=resdata)
 
-heat <- resdata %>%
-  dplyr::select(gene_name,colnames(count))
-heat = heat[-which(duplicated(heat$gene_name)),]
-rownames(heat) <- heat[,1]
-heat <- heat[,-1]
 
-heat <- heat %>%
-  dplyr::filter(rownames(heat) %in% gene)
-
-p <- pheatmap(heat,scale = "row", clustering_distance_row = "correlation",
-         show_colnames = T,show_rownames = T,
-         cluster_cols = T,cluster_rows = T,
-         color = colorRampPalette(c('#2471A3','white','#C0392B'))(50),
-         border_color = 'white',
-         display_numbers = F,main = "",key=T,fontsize_row = 10)
 geneset <- GSA.read.gmt("./data/GSEA/geneset.gmt")
 UPR <- geneset$genesets 
 UPR <- UPR[[2]]
