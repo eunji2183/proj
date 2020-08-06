@@ -1,8 +1,8 @@
 rm(list = ls())
 setwd("/home/eunji/proj/200612_microdust/")
 path <- "./data/featurecounts/con_vs_upm"
-
 source("./code/DEG_functions.R")
+
 library(pheatmap)
 library(magrittr) #%>%
 library(dplyr)
@@ -13,7 +13,7 @@ library(DESeq2)
 library(limma)
 options(scipen = 999) #e remove
 
-
+#gtf
 gtf <- rtracklayer::import("/home/eunji/proj/0_sh/ref/rna/Homo_sapiens.GRCh38.96.gtf")
 gtf <- as.data.frame(gtf)
 ID <- gtf %>%
@@ -24,7 +24,7 @@ group <- rep(c("con","upm"),c(2,2))
 count <- data(path = path)
 
 #DESeq2
-resdata <- DESeq2.1(count = count)
+resdata <- DESeq2.1(count = count,group=group,ID=ID)
 write.csv(resdata,file="./result/res.csv")
 
 ggplot(data = resdata, aes(x=log2FoldChange,y=-log10(padj),col = DEG)) +
@@ -53,14 +53,18 @@ ggplot(tccRES, aes(a.value, m.value, col = estimatedDEG)) +
   theme_bw() +
   ggtitle("DEG(DESeq2) plot")
 
+#heatmap
 gene <- c("EIF2AK3","HSPA5","ATF6","ERN1",
           "BANF1","EXOSC10","EXOSC4","EIF4A1","NOLC1","NHP2","TTC37","CXXC1","ATF3","DNAJC3",
           "PDIA6","DDIT4","HYOU1","FUS","ALDN18A1","IMP3","GEMIN4",
           "MEF2C","NFATC2","SIK1","CAMK2A","IL12RB1","CYP1A1","NQO1",
           "TNF","F2RL3","CXCR2","CCL3","XBP1","GRIA4","FPR1",
           "GCLM","HSP90B1","TXNRD1","CALR","CRELD2")
-heatmap(df=resdata)
+heatmap(df=resdata,gene=gene,raw=count)
 
+#datatable
+gene_data <- datatable(res = resdata,raw = count,gene = gene,ID=ID)
+write.csv(gene_data,file="./result/gene_data.csv",row.names = F)
 
 geneset <- GSA.read.gmt("./data/GSEA/geneset.gmt")
 UPR <- geneset$genesets 
