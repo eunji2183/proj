@@ -91,6 +91,8 @@ edgeR.2 <- function(count,group,ID){
 
 #df=resdata(dataframe) , gene=gene(character), raw=count
 heatmap <- function(df,gene,raw){
+  suppressMessages(library(magrittr))
+  suppressMessages(library(dplyr))
   suppressMessages(library(pheatmap))
   heat <- df %>%
     dplyr::select(gene_name,colnames(raw))
@@ -108,12 +110,16 @@ heatmap <- function(df,gene,raw){
   return(p)
 }
 
-#res=resdata , raw=count , ID=ID
+#res=resdata , raw=count ,gene=gene(character),ID=ID
 
-datatable <- function(res,raw,ID){
+datatable <- function(res,raw,gene,ID){
+  suppressMessages(library(magrittr))
+  suppressMessages(library(dplyr))
   heat <- res %>%
     dplyr::select(gene_name,colnames(raw),pvalue)
   heat = heat[-which(duplicated(heat$gene_name)),]
+  heat <- heat %>%
+    dplyr::filter(gene_name %in% gene)
   for(i in 1:length(colnames(raw))){
     names(raw)[i] <- paste0('Raw_',names(raw)[i])
     }
