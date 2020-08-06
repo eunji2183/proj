@@ -18,9 +18,10 @@ data <- function(path){
   return(count)  
 }
 
-DESeq2.1 <- function(count){
+DESeq2.1 <- function(count,group,ID){
   suppressMessages(library(DESeq2))
   suppressMessages(library(dplyr))
+  suppressMessages(library(magrittr))
   coldata <- data.frame(row.names = colnames(count),group)
   dds <- DESeqDataSetFromMatrix(countData = count,colData = coldata,design = ~group)
   dds <- DESeq(dds)
@@ -39,7 +40,7 @@ DESeq2.1 <- function(count){
   return(resdata)
 }
 
-DESeq2.2 <- function(count){
+DESeq2.2 <- function(count,group,ID){
   suppressMessages(library(TCC))
   suppressMessages(library(DESeq2))
   suppressMessages(library(dplyr))
@@ -53,7 +54,7 @@ DESeq2.2 <- function(count){
   return(tccRES)
 }
 
-edgeR.1 <- function(count){
+edgeR.1 <- function(count,group,ID){
   gene_id <- rownames(count)
   dgelist <- DGEList(counts = count,genes = gene_id,group = group)
   dgelist_norm <- calcNormFactors(dgelist,method='TMM')
@@ -73,7 +74,8 @@ edgeR.1 <- function(count){
   return(tTag)
 }
 
-edgeR.2 <- function(count){
+#count=count,group=group(coldata),ID=ID
+edgeR.2 <- function(count,group,ID){
   suppressMessages(library(TCC))
   suppressMessages(library(edgeR))
   suppressMessages(library(dplyr))
@@ -87,10 +89,11 @@ edgeR.2 <- function(count){
   return(tccRES)
 }
 
-heatmap <- function(df){
+#df=resdata(dataframe) , gene=gene(character), raw=count
+heatmap <- function(df,gene,raw){
   suppressMessages(library(pheatmap))
-  heat <- resdata %>%
-    dplyr::select(gene_name,colnames(count))
+  heat <- df %>%
+    dplyr::select(gene_name,colnames(raw))
   heat = heat[-which(duplicated(heat$gene_name)),]
   rownames(heat) <- heat[,1]
   heat <- heat[,-1]
@@ -104,3 +107,22 @@ heatmap <- function(df){
                 display_numbers = F,main = "",key=T,fontsize_row = 10)
   return(p)
 }
+
+#res=resdata , raw=count , ID=ID
+
+datatable <- function(res,raw,ID){
+  heat <- res %>%
+    dplyr::select(gene_name,colnames(raw),pvalue)
+  heat = heat[-which(duplicated(heat$gene_name)),]
+  for(i in 1:length(colnames(raw))){
+    names(raw)[i] <- paste0('Raw_',names(raw)[i])
+    }
+  rawdata <- data.frame(gene_id=rownames(raw),raw)
+  rownames(rawdata) <- NULL
+  rawdata <- merge(ID,rawdata,by="gene_id")
+  rawdata$gene_id <- NULL
+  data <- merge(rawdata,heat,by="gene_name")
+  data <- data[order(data$pvalue),]
+  return(data)
+}                  
+                  
