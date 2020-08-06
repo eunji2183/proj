@@ -1,17 +1,29 @@
-source("./code/DEG_functions.R")
-library(pheatmap)
-
 rm(list = ls())
 setwd("/home/eunji/proj/200612_microdust/")
 path <- "./data/featurecounts/con_vs_upm"
-group <- rep(c("con","upm"),c(2,2))
+
+source("./code/DEG_functions.R")
+library(pheatmap)
+library(magrittr) #%>%
+library(dplyr)
+library(ggplot2) #ggplot
+library(ggrepel) #geom_label_repel
+library(TCC)
+library(DESeq2)
+library(limma)
+options(scipen = 999) #e remove
+
+
 gtf <- rtracklayer::import("/home/eunji/proj/0_sh/ref/rna/Homo_sapiens.GRCh38.96.gtf")
 gtf <- as.data.frame(gtf)
 ID <- gtf %>%
   dplyr::select(gene_id,gene_name) %>% distinct()
+save(ID,file="./data/ID.RData")
 
+group <- rep(c("con","upm"),c(2,2))
 count <- data(path = path)
 resdata <- DESeq2.1(count = count)
+write.csv(resdata,file="./result/res.csv")
 
 ggplot(data = resdata, aes(x=log2FoldChange,y=-log10(padj),col = DEG)) +
   geom_point(alpha=0.5)+
@@ -39,22 +51,23 @@ ggplot(tccRES, aes(a.value, m.value, col = estimatedDEG)) +
   theme_bw() +
   ggtitle("DEG(DESeq2) plot")
 
-heat <- resdata %>%
-  dplyr::select(gene_name,CON,p5_con,p5_upm,UPM)
-heat = heat[-which(duplicated(heat$gene_name)),]
-rownames(heat) <- heat[,1]
-heat <- heat[,-1]
-
 gene <- c("EIF2AK3","HSPA5","ATF6","ERN1",
           "BANF1","EXOSC10","EXOSC4","EIF4A1","NOLC1","NHP2","TTC37","CXXC1","ATF3","DNAJC3",
           "PDIA6","DDIT4","HYOU1","FUS","ALDN18A1","IMP3","GEMIN4",
           "MEF2C","NFATC2","SIK1","CAMK2A","IL12RB1","CYP1A1","NQO1",
           "TNF","F2RL3","CXCR2","CCL3","XBP1","GRIA4","FPR1",
           "GCLM","HSP90B1","TXNRD1","CALR","CRELD2")
-heat4 <- heat %>%
+
+heat <- resdata %>%
+  dplyr::select(gene_name,colnames(count))
+heat = heat[-which(duplicated(heat$gene_name)),]
+rownames(heat) <- heat[,1]
+heat <- heat[,-1]
+
+heat <- heat %>%
   dplyr::filter(rownames(heat) %in% gene)
 
-pheatmap(heat4,scale = "row", clustering_distance_row = "correlation",
+p <- pheatmap(heat,scale = "row", clustering_distance_row = "correlation",
          show_colnames = T,show_rownames = T,
          cluster_cols = T,cluster_rows = T,
          color = colorRampPalette(c('#2471A3','white','#C0392B'))(50),
