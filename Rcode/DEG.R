@@ -22,6 +22,8 @@ save(ID,file="./data/ID.RData")
 
 group <- rep(c("con","upm"),c(2,2))
 count <- data(path = path)
+
+#DESeq2
 resdata <- DESeq2.1(count = count)
 write.csv(resdata,file="./result/res.csv")
 
