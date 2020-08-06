@@ -132,3 +132,18 @@ datatable <- function(res,raw,gene,ID){
   return(data)
 }                  
                   
+#GO&KEGG : res=resdata,p=0.05(pvalue cutoff),FC=1(logFC cutoff)
+GO_KEGG <- function(res,p,FC){
+  suppressMessages(library(clusterProfiler))
+  suppressMessages(library(org.Hs.eg.db))
+  suppressMessages(library(magrittr))
+  suppressMessages(library(dplyr))
+  DE <- res %>%
+    dplyr::filter(pvalue < p & abs(log2FoldChange) > FC)
+  gene <- DE$gene_name
+  gene <- bitr(gene,fromType = "SYMBOL",toType = "ENTREZID",OrgDb = "org.Hs.eg.db")
+  de <- gene$ENTREZID
+  go <- enrichGO(gene = de, OrgDb = "org.Hs.eg.db",ont = "all")
+  EGG <- enrichKEGG(gene = de,organism = 'hsa',pvalueCutoff = 0.05)
+  return(list(go,EGG))
+}
