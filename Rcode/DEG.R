@@ -66,6 +66,19 @@ heatmap(df=resdata,gene=gene,raw=count)
 gene_data <- datatable(res = resdata,raw = count,gene = gene,ID=ID)
 write.csv(gene_data,file="./result/gene_data.csv",row.names = F)
 
+#GO & KEGG (clusterprofiler)
+gokegg <- GO_KEGG(res = resdata,p=0.1,FC=0)
+dotplot(gokegg[[1]],split ="ONTOLOGY") +facet_grid(ONTOLOGY~.,scale ="free")
+dotplot(gokegg[[2]])
+browseKEGG(gokegg[[2]], 'hsa04015')
+
+#GSEA rnk file 
+gsea <- resdata %>%
+  dplyr::select(gene_name,log2FoldChange)
+write.table(gsea,file = "./result/gsearank.rnk",sep = "\t",row.names = F,col.names = F,quote = F)
+
+
+
 geneset <- GSA.read.gmt("./data/GSEA/geneset.gmt")
 UPR <- geneset$genesets 
 UPR <- UPR[[2]]
@@ -82,15 +95,6 @@ len_vec[1]=3
 for(i in 1:length(S$genesets)){len_vec[i] <- c(length(S$genesets[[i]]))}
 pathway_vec <- unlist(Vectorize(rep.int)(S$geneset.names,len_vec),use.names = F)
 S7_1 <- as.data.frame(cbind(geneset=pathway_vec,symbol=unlist(S$genesets,use.names = F)))
-
-geneset <- S7_1[grep("OXIDATIVE",S7_1$geneset),]
-geneset <- geneset[grep("STRESS",geneset$geneset),]
-
-gsea <- resdata %>%
-  dplyr::select(gene_name,log2FoldChange)
-write.table(gsea,file = "./result/gsearank.rnk",sep = "\t",row.names = F,col.names = F,quote = F)
-
-
 
 gsea <- gsea[order(gsea$log2FoldChange,decreasing = T),]
 gsea <- gsea %>%
