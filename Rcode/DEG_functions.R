@@ -89,21 +89,15 @@ edgeR.2 <- function(count,group,ID){
   return(tccRES)
 }
 
-#TPM FPKM normalization 
-countToTpm <- function(counts, effLen){
-  rate <- log(counts) - log(effLen)
-  denom <- log(sum(exp(rate)))
-  exp(rate - denom + log(1e6))}
-
-countToFpkm <- function(counts, effLen){
-  N <- sum(counts)
-  exp( log(counts) + log(1e9) - log(effLen) - log(N) )}
-
-fpkmToTpm <- function(fpkm){
-  exp(log(fpkm) - log(sum(fpkm)) + log(1e6))}
-
-countToEffCounts <- function(counts, len, effLen){
-  counts * (len / effLen)}                  
+#TPM normalization 
+#gene_length
+#cat Homo_sapiens.GRCh38.96.gtf | awk -F'\t' '{if($3=="gene") {split($9,a,";"); print a[1]"\t"$5-$4};}' | sed 's/[gene_id |"|]//g' > hg38_gene_length.txt
+tpm <- function(counts,lengths){
+  rpk <- counts/(lengths/1000)
+  coef <- sum(rpk)/1e6
+  rpk/coef
+} 
+#tpms <- apply(counts,2,function(x)tpm(x,genes$gene_length))
                   
 #df=resdata(dataframe) , gene=gene(character), raw=count
 heatmap <- function(df,gene,raw){
