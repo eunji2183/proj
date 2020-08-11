@@ -155,5 +155,100 @@ rownames(count) <- count[,1]
 count <- count[,-1]
 colnames(count) <- str_sub(colnames(count),1,12)
 colnames(count) <- gsub('.','-',colnames(count),fixed = T)
-sample <- clin$bcr_patient_barcode
-count2 <- count[,c(names(count) %in% sample)]
+tcount <- as.data.frame(t(count))
+rownames(tcount) <- gsub('.','-',rownames(tcount),fixed = T)
+sample <- readxl::read_excel("./source_data/eSupplement_2_06_03_18.xlsx",
+                             sheet = "eWorksheet 1",
+                             range = "A4:A1086",
+                             col_names = F)
+sample$...1 <- str_sub(sample$...1,1,12) 
+sample <- unique(sample$...1)
+tcount <- tcount[c(rownames(tcount) %in% sample),]
+count <- as.data.frame(t(tcount))
+#=====================================================================
+#maftools
+
+library(maftools)
+mut <- read.maf(maf = "./data/TCGA/oncocator/onco.maf")
+summary <- getSampleSummary(mut)
+summary$Tumor_Sample_Barcode <- str_sub(summary$Tumor_Sample_Barcode,1,12)
+summary = summary[-which(duplicated(summary$Tumor_Sample_Barcode)),]
+summary <- summary %>%
+  dplyr::mutate(TMB=total/38) %>%
+  dplyr::mutate(TMB_group=ifelse(TMB>mean(TMB),'high','low')) %>%
+  dplyr::filter(TMB < 30) %>%
+  dplyr::mutate(Breast_Tumors=1:nrow(summary))
+gene_summary <- getGeneSummary(mut)
+
+datatable(getSampleSummary(mut),
+          filter = 'top',
+          options = list(scrollX=T,keys=T,pageLength=5),
+          rownames = F)
+
+plotmafSummary(maf = mut, rmOutlier = TRUE, addStat = 'mean', dashboard = TRUE,
+               titvRaw = F,top = 10)
+oncoplot(maf = mut, top = 20, removeNonMutated = TRUE)
+oncostrip(maf = mut)
+oncostrip(maf = mut,genes=c("TP53","TTN","KMT2D"))
+library(ggplot2)
+BiocManager::install("ggridges")
+library(ggridges)
+ggplot(summary,aes(x=Breast_Tumors,y=TMB,height=TMB,fill=TMB_group))+
+  geom_ridgeline() +
+  ggtitle("TMB distribution")
+  
+OncogenicPathways(maf = mut) #pathway
+PlotOncogenicPathways(maf = mut,pathways = "WNT")
+mutsig <- prepareMutSig(maf=mut) #prepare mutsig file
+
+#=======================================================
+#CIBERSORT - tumor infiltrting lymphocytes(TIL)
+source("./code/CIBERSORT.R")
+LM22 <- read.delim("./data/CIBERSORT/LM22.txt")
+exp <- count[rownames(count)%in%LM22$Gene.symbol,]
+sig_matrix <- "./data/CIBERSORT/LM22.txt"
+
+#TPM normalization 
+
+gene_length <- read.table("./data/hg38_gene_length.txt",sep = "\t",header = F)
+names(gene_length)[1] <- 'gene_id'
+names(gene_length)[2] <- 'gene_length'
+ID <- merge(ID,gene_length,by="gene_id")
+ID$gene_id <- NULL
+
+tpm <- function(counts,lengths){
+  rpk <- counts/(lengths/1000)
+  coef <- sum(rpk)/1e6
+  rpk/coef
+}
+exp <- data.frame(gene_name=rownames(exp),exp)
+rownames(exp) <- NULL
+merge <- merge(ID,exp,by="gene_name")
+genes <- data.frame(merge[,1:2])
+counts <- data.frame(row.names=merge$gene_name,merge[,3:1078])
+tpms <- apply(counts,2,function(x)tpm(x,genes$gene_length))
+colSums(tpms) #1e+06
+tpm_exp <- as.data.frame(tpms)
+colnames(tpm_exp) <- gsub('.','-',colnames(tpm_exp),fixed = T)
+tpm_exp <- data.frame(gene_name=rownames(tpm_exp),tpm_exp)
+rownames(tpm_exp) <- NULL
+write.table(tpm_exp,file = "./result/ciber_matrix_tpm.txt",sep = "\t",quote = F)
+mixture_file = "./result/ciber_matrix_tpm.txt"
+res_cibersort <- CIBERSORT(sig_matrix, mixture_file, perm=10, QN=F)
+res <- as.data.frame(res_cibersort)
+library(dplyr)
+library(tidyr)
+library(tibble)
+res1 <- res %>%
+  as.data.frame() %>% 
+  rownames_to_column("sample") %>% 
+  pivot_longer(cols=2:23,
+               names_to= "celltype",
+               values_to = "Proportion")
+
+
+library(ggplot2)
+ggplot(res1,aes(sample,Proportion,fill = celltype)) + 
+  geom_bar(position = "stack",stat = "identity")+
+  theme_bw()+
+  guides(fill=guide_legend(ncol=1))
