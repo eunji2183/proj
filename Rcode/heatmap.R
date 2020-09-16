@@ -82,10 +82,11 @@ DESeq2.2 <- function(count,group,ID){
 }
 res2 <- DESeq2.2(count = count,group = group,ID=ID)
 library(pheatmap)
+annotation_row = data.frame(row.names = rownames(heat),
+  GeneGroup=factor(rep(c("Inflammation","ER stress","Ca2+ signaling","Melanogenesis","Aryl hydrocarbon"),
+                       c(3,8,1,7,2))))
 pheatmap(heat,scale="row",color = colorRampPalette(c("navy", "white", "firebrick3"))(50), fontsize_col = 12, fontsize_row=12,
          cellwidth = 17, cellheight = 17,show_rownames = T,show_colnames = T,legend = T,
          border="white",cluster_cols = T,cluster_rows = F,
          annotation_row = annotation_row,annotation_legend = T)
-annotation_row = data.frame(row.names = rownames(heat),
-  GeneGroup=factor(rep(c("Inflammation","ER stress","Ca2+ signaling","Melanogenesis","Aryl hydrocarbon"),
-                       c(3,8,1,7,2))))
+
