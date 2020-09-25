@@ -20,7 +20,8 @@ rm ./3.qc/clean_qc/*.html
 rm ./3.qc/clean_qc/*.log
 
 ##hisat2_tran.sh                                                                
-INDEX=/home/eunji/proj/0_sh/ref/grch38_tran/genome_tran
+INDEX=/home/eunji/proj/0_sh/ref/rna/grch38_tran/genome_tran
+#INDEX=/home/eunji/proj/0_sh/ref/rna/grcm38_tran/genome_tran
 
 cat config | while read id
 do
@@ -48,7 +49,9 @@ echo "end samtools sort name for ${id}" `date`
 done
 
 ##featureCounts.sh                                                              
-GTF=/home/eunji/proj/0_sh/ref/Homo_sapiens.GRCh38.96.gtf
+GTF=/home/eunji/proj/0_sh/ref/rna/Homo_sapiens.GRCh38.96.gtf
+#GTF=/home/eunji/proj/0_sh/ref/rna/Mus_musculus.GRCm38.101.gtf
+
 cat config | while read id
 do
  echo "start featureCounts for ${id}" `date`
