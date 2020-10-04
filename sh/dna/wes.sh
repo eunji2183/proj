@@ -183,6 +183,12 @@ do
 done
 
 #ANNOVAR - annotation 
+#cd ./biosoft
+# wget 下载地址
+#tar -zxvf annovar.latest.tar.gz
+#cd annovar
+#nohup ./annotate_variation.pl -downdb -webfrom annovar gnomad_genome --buildver hg38 humandb/ >down.log 2>&1 &  ##41G	humandb/
+
 cat config | while  read id
 do
 echo "start ANNOVAR for ${id} " `date`
@@ -195,4 +201,35 @@ echo "start ANNOVAR for ${id} " `date`
 -nastring . \
 -vcfinput
 echo "end ANNOVAR for ${id} " `date`
+done
+
+#funcotator -annotation 
+cd ./data
+nohup wget -c ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/funcotator/funcotator_dataSources.v1.6.20190124s.tar.gz &
+tar -zxvf funcotator_dataSources.v1.6.20190124s.tar.gz
+
+GATK=./biosoft/gatk-4.1.4.1/gatk
+bed=./data/hg38.exon.bed
+dict=./data/Homo_sapiens_assembly38.dict
+
+$GATK BedToIntervalList -I ${bed} -O hg38.exon.interval_list -SD ${dict}
+
+cd ../project
+#funcotator.sh
+GATK=./biosoft/gatk-4.1.4.1/gatk
+ref=./data/Homo_sapiens_assembly38.fasta
+interval=./data//hg38.exon.interval_list
+source==./data/funcotator_dataSources.v1.6.20190124s
+cat config | while read id
+do
+	echo "start Funcotator for ${id} " `date`
+  $GATK IndexFeatureFile --input ./6.mutect/${id}_filter.vcf
+	$GATK  Funcotator -R $ref \
+	-V ./6.mutect/${id}_filter.vcf \
+	-O ./7.annotation/funcotator/${id}_funcotator.tmp.maf \
+	--data-sources-path ${source} \
+	--intervals ${interval} \
+	--output-file-format MAF \
+	--ref-version hg38 
+	echo "end Funcotator for ${id} " `date`
 done
