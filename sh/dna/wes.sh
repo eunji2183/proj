@@ -155,7 +155,7 @@ $GATK --java-options "-Xmx20G -Djava.io.tmpdir=./" GatherVcfs \
 $(for i in {1..22} X Y M;do echo "-I gvcfs_chr${i}.vcf" ;done) \
 -O merge.vcf
 
-## mutect.sh
+## mutect.sh - somatic mutation 
 GATK=./biosoft/gatk-4.1.4.1/gatk
 ref=./data/Homo_sapiens_assembly38.fasta
 bed=./data/hg38.exon.bed
