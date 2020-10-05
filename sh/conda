@@ -12,6 +12,19 @@ conda config --set show_channel_urls yes
 conda create -n dna python=3
 ## 激活 dna 小环境
 conda activate dna
+conda info --envs 
+conda remove -n myenv --all #remove env
+conda list
+conda update bwa
+conda remove bwa 
+conda env export -n myenv -f myenv.yml  #yml file 생성
+conda env create -f myenv.yml 
+source activate myenv 
+conda search bioconductor-deseq2 
+conda install bioconductor-deseq2
+conda list --explicit > myenv.txt
+#이 파일에 따라 설치 . 반드시 platform(linux-64 등) , system(64bit,32bit) 같아야함 
+conda install --name myenv --file myenv.txt
 ## 安装必要的生信软件
 conda install -y sra-tools fastqc trim-galore multiqc bwa samtools gnuplot qualimap subread vcftools bedtools cnvkit 
 conda install -y -c hcc aspera-cli=3.7.7
