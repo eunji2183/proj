@@ -32,3 +32,10 @@ do
         echo "end hisat2_tran for ${id}" `date`
 done
 
+##view.sh                                                                       
+cat config | while read id
+do
+echo "start samtools view for ${id}" `date`
+samtools view -Sb ./4.align/hisat2_tran/${id}.sam > ./4.align/hisat2_tran/${id}.bam
+echo "end samtools view for ${id}" `date`
+done
