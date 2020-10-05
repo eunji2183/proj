@@ -74,3 +74,10 @@ cat config | while read id
 do
 OptiTypePipeline.py -i ${id}_1.fastq ${id}_2.fastq --rna -v -o ./ -p ${id}.optitype.rna
 done
+
+python NeoPredPipe.py \
+-I somatic.vcf \
+-H hlatypes.txt \
+-o ./ \
+-n TestRun \
+-c 1 2 -E 8 9 10
