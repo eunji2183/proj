@@ -75,6 +75,7 @@ do
 OptiTypePipeline.py -i ${id}_1.fastq ${id}_2.fastq --rna -v -o ./ -p ${id}.optitype.rna
 done
 
+#https://github.com/MathOnco/NeoPredPipe
 python NeoPredPipe.py \
 -I somatic.vcf \
 -H hlatypes.txt \
