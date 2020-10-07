@@ -1,0 +1,1 @@
+bash NeoFuse -1 /home/eunji/2.clean_fq/70615-MLS-R_1_val_1.fq -2 /home/eunji/2.clean_fq/70615-MLS-R_2_val_2.fq -s /home/eunji/tool/star/STAR_idx/ -g /home/eunji/tool/star/GRCh38.primary_assembly.genome.fa -a /home/eunji/tool/star/gencode.v31.annotation.gtf -d 70615-MLS -N netMHCpan-4.1 --docker
