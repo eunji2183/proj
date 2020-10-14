@@ -86,30 +86,25 @@ do
 	echo "end bwa for ${id}" `date`
 done
 
-#GATK - MarkDuplicates
-GATK=./biosoft/gatk-4.1.4.1/gatk
-
+##MarhDuplicates.sh 
+GATK=/home/eunji/miniconda3/envs/gatk/share/gatk4-4.1.9.0-0/gatk-package-4.1.9.0-local.jar
 cat config  | while read id
 do
-	BAM=./4.align/${id}.bam
-	if [ ! -f ./5.gatk/ok.${id}_marked.status ]
-	then
-		echo "start MarkDuplicates for ${id}" `date`
-		$GATK --java-options "-Xmx20G -Djava.io.tmpdir=./" MarkDuplicates \
-		-I ${BAM} \
-		--REMOVE_DUPLICATES=true \
-		-O ./5.gatk/${id}_marked.bam \
-		-M ./5.gatk/${id}.metrics \
-		1>./5.gatk/${id}_log.mark 2>&1 
-		
-		if [ $? -eq 0 ]
-		then
-			touch ./5.gatk/ok.${id}_marked.status
-		fi
-		echo "end MarkDuplicates for ${id}" `date`
-		samtools index -@ 16 -m 4G -b ./5.gatk/${id}_marked.bam ./5.gatk/${id}_marked.bai
-	fi
+                echo "start MarkDuplicates for ${id}" `date`
+      java -jar $GATK  MarkDuplicates -I ./${id}.bam -O ./5.gatk/${id}_marked.bam -M ./5.gatk/${id}.metrics.txt 1>./5.gatk/${id}_log.mark 2>&1
+                echo "end MarkDuplicates for ${id}" `date`
 done
+
+##index_marked_bam.sh
+
+cat config | while read id
+
+ do
+  echo "start samtools index mark duplicates bam ${id}" `date`
+  time samtools index -@ 10 -b ./5.gatk/${id}_marked.bam ./5.gatk/${id}_marked.bai
+  echo "end samtools index mark duplicates bam ${id}" `date`
+done
+
 
 #BQSR
 GATK=./biosoft/gatk-4.1.4.1/gatk
