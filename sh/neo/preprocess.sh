@@ -105,35 +105,32 @@ cat config | while read id
   echo "end samtools index mark duplicates bam ${id}" `date`
 done
 
-
-#BQSR
-GATK=./biosoft/gatk-4.1.4.1/gatk
-snp=./data/dbsnp_146.hg38.vcf.gz
-indel=./data/Mills_and_1000G_gold_standard.indels.hg38.vcf.gz
-ref=./data/Homo_sapiens_assembly38.fasta
+#BQSR.sh
+GATK=/home/eunji/miniconda3/envs/gatk/share/gatk4-4.1.9.0-0/gatk-package-4.1.9.0-local.jar
+snp=/home/eunji/ref/dbsnp_146.hg38.vcf.gz
+indel=/home/eunji/ref/Mills_and_1000G_gold_standard.indels.hg38.vcf.gz
+ref=/home/eunji/ref/Homo_sapiens_assembly38.fasta
 cat config  | while read id
 do
-	if [ ! -f ./5.gatk/${id}_bqsr.bam ]
-	then
-		echo "start BQSR for ${id}" `date`
-		$GATK --java-options "-Xmx20G -Djava.io.tmpdir=./"  BaseRecalibrator \
-		-R $ref  \
-		-I ./5.gatk/${id}_marked.bam  \
-		--known-sites ${snp} \
-		--known-sites ${indel} \
-		-O ./5.gatk/${id}_recal.table \
-		1>./5.gatk/${id}_log.recal 2>&1 
-		
-		$GATK --java-options "-Xmx20G -Djava.io.tmpdir=./"  ApplyBQSR \
-		-R $ref  \
-		-I ./5.gatk/${id}_marked.bam  \
-		-bqsr ./5.gatk/${id}_recal.table \
-		-O ./5.gatk/${id}_bqsr.bam \
-		1>./5.gatk/${id}_log.ApplyBQSR  2>&1 
-		
-		echo "end BQSR for ${id}" `date`
-	fi
+                echo "start BQSR for ${id}" `date`
+      java -jar $GATK BaseRecalibrator \
+                -R $ref  \
+                -I ./${id}_marked.bam  \
+                --known-sites ${snp} \
+                --known-sites ${indel} \
+                -O ./${id}_recal.table \
+                1>./${id}_log.recal 2>&1
+      java -jar $GATK ApplyBQSR \
+                -R $ref  \
+                -I ./${id}_marked.bam  \
+                -bqsr ./${id}_recal.table \
+                -O ./${id}_bqsr.bam \
+                1>./${id}_log.ApplyBQSR  2>&1
+
+                echo "end BQSR for ${id}" `date`
 done
+
+
 
 #Germline SNPs + Indels
 GATK=./biosoft/gatk-4.1.4.1/gatk
