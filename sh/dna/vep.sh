@@ -12,7 +12,7 @@ mkdir $HOME/vep_data
 chmod a+rwx $HOME/vep_data    
 
 docker run -t -i -v $HOME/vep_data:/opt/vep/.vep ensemblorg/ensembl-vep
-docker run -t -i -v $HOME/vep_data:/opt/vep/.vep ensemblorg/ensembl-vep perl INSTALL.pl -a cfp -s homo_sapiens -y GRCh38 -g all
+perl INSTALL.pl -a cfp -s homo_sapiens -y GRCh38 -g all
 sudo docker run -t -i -v $HOME/vep_data:/opt/vep/.vep ensemblorg/ensembl-vep
 cat /opt/vep/.vep/wes_cancer/project/config | while read id
 do
