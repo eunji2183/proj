@@ -2,8 +2,8 @@ sudo apt install docker-io
 docker --version
 sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu artful stable"
 sudo docker run hello-world
-docker pull ensemblorg/ensembl-vep
-docker run -t -i ensemblorg/ensembl-vep ./vep
+sudo docker pull ensemblorg/ensembl-vep
+sudo docker run -t -i ensemblorg/ensembl-vep ./vep
 # Create a directory on your machine:
 mkdir $HOME/vep_data
 
