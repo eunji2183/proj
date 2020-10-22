@@ -91,7 +91,7 @@ GATK=/home/eunji/miniconda3/envs/gatk/share/gatk4-4.1.9.0-0/gatk-package-4.1.9.0
 cat config  | while read id
 do
                 echo "start MarkDuplicates for ${id}" `date`
-      java -jar $GATK  MarkDuplicates -I ./${id}.bam -O ./5.gatk/${id}_marked.bam -M ./5.gatk/${id}.metrics.txt 1>./5.gatk/${id}_log.mark 2>&1
+      java -jar $GATK  MarkDuplicates -I ./${id}.bam -O ./5.gatk/${id}_marked.bam -M ./5.gatk/${id}.metrics.txt 
                 echo "end MarkDuplicates for ${id}" `date`
 done
 
