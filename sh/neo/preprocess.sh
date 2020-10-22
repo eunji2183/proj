@@ -131,25 +131,24 @@ do
 done
 
 
-
 #Germline SNPs + Indels
-GATK=./biosoft/gatk-4.1.4.1/gatk
-snp==./data/dbsnp_146.hg38.vcf.gz
-indel=./data/Mills_and_1000G_gold_standard.indels.hg38.vcf.gz
-ref=./data/Homo_sapiens_assembly38.fasta
-bed=./data/hg38.exon.bed
+GATK=/home/eunji/miniconda3/envs/gatk/share/gatk4-4.1.9.0-0/gatk-package-4.1.9.0-local.jar
+snp=/home/eunji/ref/dbsnp_146.hg38.vcf.gz
+indel=/home/eunji/ref/Mills_and_1000G_gold_standard.indels.hg38.vcf.gz
+ref=/home/eunji/ref/Homo_sapiens_assembly38.fasta
+bed=/home/eunji/ref/hg38.exon.bed
 
-cat config  | while read id
+cat config2  | while read id
 do
-	echo "start HC for ${id}" `date`
-	$GATK --java-options "-Xmx20G -Djava.io.tmpdir=./" HaplotypeCaller -ERC GVCF \
-	-R ${ref} \
-	-I ./5.gatk/${id}_bqsr.bam \
-	--dbsnp ${snp} \
-	-L ${bed} \
-	-O ./5.gatk/${id}_raw.vcf \
-	1>./5.gatk/${id}_log.HC 2>&1
-	echo "end HC for ${id}" `date`
+echo "start HC for ${id}" `date`
+        java -jar $GATK HaplotypeCaller -ERC GVCF \
+        -R ${ref} \
+        -I ./${id}_bqsr.bam \
+        --dbsnp ${snp} \
+        -L ${bed} \
+        -O ./${id}_raw.vcf \
+        1>./${id}_log.HC 2>&1
+        echo "end HC for ${id}" `date`
 
 done
 
@@ -157,27 +156,27 @@ cd ./5.gatk/gvcf
 for chr in chr{1..22} chrX chrY chrM
 do
 
-time $GATK --java-options "-Xmx20G -Djava.io.tmpdir=./" GenomicsDBImport \
+java -jar $GATK GenomicsDBImport \
 -R ${ref} \
 $(ls ./*raw.vcf | awk '{print "-V "$0" "}') \
 -L ${chr} \
 --genomicsdb-workspace-path gvcfs_${chr}.db
 
-time $GATK --java-options "-Xmx20G -Djava.io.tmpdir=./" GenotypeGVCFs \
+java -jar $GATK GenotypeGVCFs \
 -R ${ref} \
 -V gendb://gvcfs_${chr}.db \
 -O gvcfs_${chr}.vcf
 
 done
 
-$GATK --java-options "-Xmx20G -Djava.io.tmpdir=./" GatherVcfs \
+java -jar $GATK GatherVcfs \
 $(for i in {1..22} X Y M;do echo "-I gvcfs_chr${i}.vcf" ;done) \
 -O merge.vcf
 
 ## mutect.sh - somatic mutation 
-GATK=./biosoft/gatk-4.1.4.1/gatk
-ref=./data/Homo_sapiens_assembly38.fasta
-bed=./data/hg38.exon.bed
+GATK=/home/eunji/miniconda3/envs/gatk/share/gatk4-4.1.9.0-0/gatk-package-4.1.9.0-local.jar
+ref=/home/eunji/ref/Homo_sapiens_assembly38.fasta
+bed=/home/eunji/ref/hg38.exon.bed
 
 cat config2 | while read id
 do
@@ -186,14 +185,14 @@ do
 	T=./5.gatk/${arr[1]}_bqsr.bam
 	N=./5.gatk/${arr[0]}_bqsr.bam
 	echo "start Mutect2 for ${id}" `date`
-	$GATK  --java-options "-Xmx20G -Djava.io.tmpdir=./"  Mutect2 -R ${ref} \
+	java -jar $GATK  Mutect2 -R ${ref} \
 	-I ${T} -tumor  $(basename "$T" _bqsr.bam) \
 	-I ${N} -normal $(basename "$N" _bqsr.bam) \
 	-L ${bed}  \
 	-O ./6.mutect/${sample}_mutect2.vcf
 
-	$GATK  FilterMutectCalls \
-  -R ${ref} \
+	java -jar $GATK  FilterMutectCalls \
+        -R ${ref} \
 	-V ./6.mutect/${sample}_mutect2.vcf \
 	-O ./6.mutect/${sample}_somatic.vcf
 	echo "end Mutect2 for ${id}" `date`
