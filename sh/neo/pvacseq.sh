@@ -28,6 +28,17 @@ done
 conda install vt 
 pip install vcf-annotation-tools
 
+#add_expression_vcf.sh 
+cat config | while read id 
+do
+vcf-expression-annotator -s ${id} 
+-o ../../8.pvacseq/vcf/${id}.tx.vcf 
+--ignore-transcript-version 
+${id}_vep.vcf 
+/home/eunji/proj/RMLS/rna/6.isoform/kallisto/${id}/abundance.tsv kallisto transcript 
+done 
+
+
 conda create -n bam-read
 conda activate bam-read 
 conda install -c bioconda bam-readcount
