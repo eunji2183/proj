@@ -23,6 +23,15 @@ rm ./3.qc/clean_qc/*.log
 ---------------------------------------------------------------------------------------------------------------------------------------------
 #RNA
 
+#isoform.sh (kallisto)
+cat config | while read id
+do
+kallisto quant -i /home/eunji/proj/0_sh/ref/rna/Homo_sapiens.GRCh38.cdna.all.idx 
+-o ../6.isoform/kallisto/${id} 
+${id}-R_1_val_1.fq.gz ${id}-R_2_val_2.fq.gz
+done 
+
+
 ##hisat2_tran.sh                                                               \
                                                                                 
 INDEX=/home/eunji/proj/0_sh/ref/rna/grch38_tran/genome_tran
