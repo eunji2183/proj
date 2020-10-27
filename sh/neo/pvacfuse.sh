@@ -36,6 +36,15 @@ cd ~/proj/0_sh/biosoft/INTEGRATE_0_2_6/INTERGRATE-build/bin
 mkdir ./bwts 
 ./Integrate mkbwt /home/eunji/proj/0_sh/biosoft/INTEGRATE-Vis/INTEGRATE-Vis.1.0.0/data/reference_genome/GRCh38_r84.all.fa 
 
+#integrate fusion 
+./Integrate fusion /home/eunji/proj/0_sh/biosoft/INTEGRATE-Vis/INTEGRATE-Vis.1.0.0/data/reference_genome/GRCh38_r84.all.fa \
+/home/eunji/proj/0_sh/biosoft/INTEGRATE-Vis/INTEGRATE-Vis.1.0.0/data/gene_model/Homo_sapiens.GRCh38.84.tsv \
+./bwts/ \
+/home/eunji/proj/RMLS/rna/4.align/hisat2_tran/${id}.sort.bam 
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------
 #agfusion 
 conda create -n agfusion 
 conda activate agfusion 
