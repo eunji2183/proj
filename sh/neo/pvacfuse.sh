@@ -11,6 +11,9 @@ cat tmp.txt >> Homo_sapiens.GRCh38.84.tsv
 
 
 git clone https://github.com/ChrisMaherLab/INTEGRATE-Vis.git
+cd INTEGRATE-Vis.1.0.0
+chmod +x install.sh
+./install.sh -o /home/eunji/proj/0_sh/biosoft/integrate-vis
 cd ~/proj/0_sh/biosoft/INTEGRATE-Vis/INTEGRATE-Vis.1.0.0/data/reference_genome/
 wget ftp://ftp.ensembl.org/pub/release-84/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.chromosome.{1..22}.fa.gz 
 wget ftp://ftp.ensembl.org/pub/release-84/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.chromosome.X.fa.gz
@@ -21,7 +24,30 @@ gunzip -c Homo_sapiens.GRCh38.dna.chromosome.* > GRCh38_r84.all.fa
 
 cd INTEGRATE-Neo-V-1.2.1
 chmod +x install.sh
-./install.sh -o /home/eunji/proj/0_sh/biosoft/
+./install.sh -o /home/eunji/proj/0_sh/biosoft/integrate-neo
+
+wget https://sourceforge.net/projects/integrate-fusion/files/INTEGRATE.0.2.6.tar.gz
+cd INTEGRATE_X_X
+mkdir INTEGRATE-build
+cd INTEGRATE-build
+cmake ../Integrate/ -DCMAKE_BUILD_TYPE=release
+make
+cd ~/proj/0_sh/biosoft/INTEGRATE_0_2_6/INTERGRATE-build/bin
+mkdir ./bwts 
+./Integrate mkbwt /home/eunji/proj/0_sh/biosoft/INTEGRATE-Vis/INTEGRATE-Vis.1.0.0/data/reference_genome/GRCh38_r84.all.fa 
+
+#agfusion 
+conda create -n agfusion 
+conda activate agfusion 
+conda install pyensembl 
+pyensembl install --species homo_sapiens --release 84
+#pyensembl install --species mus_musculus --release 87
+pip install agfusion
+agfusion download -g hg38
+#agfusion download -g mm10
+conda install star-fusion 
+#star-fusion index download(31GB)
+wget https://data.broadinstitute.org/Trinity/CTAT_RESOURCE_LIB/GRCh38_gencode_v33_CTAT_lib_Apr062020.plug-n-play.tar.gz
 
 
 
