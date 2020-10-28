@@ -64,4 +64,8 @@ STAR-Fusion
     --right_fq reads_2.fq 
     --output_dir star_fusion_outdir 
     --no_remove_dups
+#fusioncatcher 
+conda create -n fusioncatcher 
+conda activate fusioncatcher 
+conda install fusioncatcher
 
