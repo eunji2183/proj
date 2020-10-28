@@ -57,6 +57,11 @@ agfusion download -g hg38
 conda install star-fusion 
 #star-fusion index download(31GB)
 wget https://data.broadinstitute.org/Trinity/CTAT_RESOURCE_LIB/GRCh38_gencode_v33_CTAT_lib_Apr062020.plug-n-play.tar.gz
-
-
+#star-fusion.sh
+STAR-Fusion 
+    --genome_lib_dir /path/to/your/CTAT_resource_lib 
+    --left_fq reads_1.fq 
+    --right_fq reads_2.fq 
+    --output_dir star_fusion_outdir 
+    --no_remove_dups
 
