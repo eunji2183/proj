@@ -42,6 +42,20 @@ mkdir ./bwts
 ./bwts/ \
 /home/eunji/proj/RMLS/rna/4.align/hisat2_tran/${id}.sort.bam 
 
+#tophat mapping 
+wget ftp://ftp.ensembl.org/pub/release-99/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz
+bowtie2-build Homo_sapiens.GRCh38.dna.primary_assembly.fa index
+tophat -G Homo_sapiens.GRCh38.99.gtf --transcriptome-index=GRCh38.99.tr GRCh38.99
+#tophat.sh 
+cat config | while read id
+do
+tophat -o /HDD2T/eunji/th/${id} --transcriptome-index=/home/eunji/ref/GRCh38.99.tr/Homo_sapiens.GRCh38.99 
+/home/eunji/ref/GRCh38.99.tr/GRCh38.99 
+/HDD2T/jeeh9/RMLS_RNA/trimmed_fq/Paired/${id}-R_R1_P.fq.gz 
+/HDD2T/jeeh9/RMLS_RNA/trimmed_fq/Paired/${id}-R_R2_P.fq.gz
+done
+
+#Integrate fusion 
 
 
 ------------------------------------------------------------------------------------------------------------------------------------
