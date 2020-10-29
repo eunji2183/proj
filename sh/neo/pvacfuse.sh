@@ -70,7 +70,7 @@ MHCflurry MHCnuggetsI MHCnuggetsII NNalign NetMHC PickPocket SMM SMMPMBEC SMMali
 -e 8,9,10
 
 ------------------------------------------------------------------------------------------------------------------------------------
-#agfusion (GRCh38.84 version 사용) 
+#agfusion (GRCh38.95 version 사용) 
 conda create -n agfusion 
 conda activate agfusion 
 conda install python=3.5
