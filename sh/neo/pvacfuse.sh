@@ -57,7 +57,7 @@ agfusion download -g hg38
 conda install star-fusion 
 #star-fusion index download(31GB)
 wget https://data.broadinstitute.org/Trinity/CTAT_RESOURCE_LIB/GRCh38_gencode_v33_CTAT_lib_Apr062020.plug-n-play.tar.gz
-#star-fusion.sh
+#star-fusion.sh (RAM 32GB)
 cat config | while read id
 do
 STAR-Fusion --genome_lib_dir /HDD2T/eunji/GRCh38_gencode_v33_CTAT_lib_Apr062020.plug-n-play/ctat_genome_lib_build_dir 
@@ -70,4 +70,10 @@ done
 conda create -n fusioncatcher 
 conda activate fusioncatcher 
 conda install fusioncatcher
+#fusioncatcher.sh (700GB)
+cat config | while read id 
+do
+fusioncatcher.py -d /home/eunji/miniconda3/envs/fusioncatcher/share/fusioncatcher-1.20/db/human_v98/ 
+-i /HDD2T/jeeh9/RMLS_RNA/trimmed_fq/Paired/ -o /HDD2T/eunji/fc/${id}/
+done
 
