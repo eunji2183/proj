@@ -73,6 +73,7 @@ MHCflurry MHCnuggetsI MHCnuggetsII NNalign NetMHC PickPocket SMM SMMPMBEC SMMali
 #agfusion (GRCh38.84 version 사용) 
 conda create -n agfusion 
 conda activate agfusion 
+conda install python=3.5
 conda install pyensembl 
 pyensembl install --species homo_sapiens --release 84
 #pyensembl install --species mus_musculus --release 87
