@@ -58,12 +58,14 @@ conda install star-fusion
 #star-fusion index download(31GB)
 wget https://data.broadinstitute.org/Trinity/CTAT_RESOURCE_LIB/GRCh38_gencode_v33_CTAT_lib_Apr062020.plug-n-play.tar.gz
 #star-fusion.sh
-STAR-Fusion 
-    --genome_lib_dir /path/to/your/CTAT_resource_lib 
-    --left_fq reads_1.fq 
-    --right_fq reads_2.fq 
-    --output_dir star_fusion_outdir 
-    --no_remove_dups
+cat config | while read id
+do
+STAR-Fusion --genome_lib_dir /HDD2T/eunji/GRCh38_gencode_v33_CTAT_lib_Apr062020.plug-n-play/ctat_genome_lib_build_dir 
+--left_fq /HDD2T/jeeh9/RMLS_RNA/trimmed_fq/Paired/${id}-R_R1_P.fq.gz 
+--right_fq /HDD2T/jeeh9/RMLS_RNA/trimmed_fq/Paired/${id}-R_R2_P.fq.gz 
+--output_dir /HDD2T/eunji/sf/${id}  --no_remove_dups
+done
+
 #fusioncatcher 
 conda create -n fusioncatcher 
 conda activate fusioncatcher 
