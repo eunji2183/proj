@@ -15,7 +15,6 @@ tophat -o /HDD2T/eunji/th/${id} --transcriptome-index=/home/eunji/ref/GRCh38.99.
 /HDD2T/jeeh9/RMLS_RNA/trimmed_fq/Paired/${id}-R_R2_P.fq.gz
 done
 
-
 conda create -n integrate-neo
 conda activate integrate-neo
 conda install bwa python gcc_linux-64 ucsc-gtftogenepred samtools bedtools matplotlib cmake 
@@ -53,14 +52,22 @@ cd ~/proj/0_sh/biosoft/INTEGRATE_0_2_6/INTERGRATE-build/bin
 mkdir ./bwts 
 ./Integrate mkbwt /home/eunji/proj/0_sh/biosoft/INTEGRATE-Vis/INTEGRATE-Vis.1.0.0/data/reference_genome/GRCh38_r99.all.fa 
 
-#integrate fusion 
-./Integrate fusion /home/eunji/proj/0_sh/biosoft/INTEGRATE-Vis/INTEGRATE-Vis.1.0.0/data/reference_genome/GRCh38_r99.all.fa \
-/home/eunji/proj/0_sh/biosoft/INTEGRATE-Vis/INTEGRATE-Vis.1.0.0/data/gene_model/Homo_sapiens.GRCh38.99.tsv \
+#integrate fusion Integrate fusion ref.fa annot.txt bwts accepted_hits.bam unmappeds.bam
+./Integrate fusion /home/eunji/ref/GRCh38.99.tr/GRCh38_r99.all.fa \
+/home/eunji/ref/GRCh38.99.tr/Homo_sapiens.GRCh38.99.tsv \
 ./bwts/ \
-/home/eunji/proj/RMLS/rna/4.align/hisat2_tran/${id}.sort.bam 
+/HDD2T/eunji/th/${id}/accepted_hits.bam /HDD2T/eunji/th/${id}/unmappeds.bam
 
+#integrate-neo.py 
+/home/eunji/tool/integrate/integrate-neo.py -t hla.optitype -f fusions.bedpe -r ref.fa -g ref.genePred -k
 
-
+pvacfuse run \
+<example_data_dir>/fusions.bedpe.annot \
+Test \
+HLA-A*02:01,HLA-B*35:01,DRB1*11:01 \
+MHCflurry MHCnuggetsI MHCnuggetsII NNalign NetMHC PickPocket SMM SMMPMBEC SMMalign \
+<output_dir> \
+-e 8,9,10
 
 ------------------------------------------------------------------------------------------------------------------------------------
 #agfusion (GRCh38.84 version 사용) 
@@ -83,6 +90,22 @@ STAR-Fusion --genome_lib_dir /HDD2T/eunji/GRCh38_gencode_v33_CTAT_lib_Apr062020.
 --right_fq /HDD2T/jeeh9/RMLS_RNA/trimmed_fq/Paired/${id}-R_R2_P.fq.gz 
 --output_dir /HDD2T/eunji/sf/${id}  --no_remove_dups
 done
+
+agfusion batch \
+-f <star_fusion_tsv> \
+-a starfusion \
+-db agfusion.homo_sapiens.84.db \
+- <output_directory> \
+--middlestar \
+--noncanonical
+
+pvacfuse run \
+<example_data_dir>/agfusion/ \
+Test \
+HLA-A*02:01,HLA-B*35:01,DRB1*11:01 \
+MHCflurry MHCnuggetsI MHCnuggetsII NNalign NetMHC PickPocket SMM SMMPMBEC SMMalign \
+<output_dir> \
+-e 8,9,10
 
 #fusioncatcher 
 conda create -n fusioncatcher 
