@@ -43,9 +43,9 @@ mkdir ./bwts
 /home/eunji/proj/RMLS/rna/4.align/hisat2_tran/${id}.sort.bam 
 
 #tophat mapping 
-wget ftp://ftp.ensembl.org/pub/release-99/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz
-bowtie2-build Homo_sapiens.GRCh38.dna.primary_assembly.fa index
-tophat -G Homo_sapiens.GRCh38.99.gtf --transcriptome-index=GRCh38.99.tr GRCh38.99
+wget ftp://ftp.ensembl.org/pub/release-99/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz (GRCh38.99.fa 로 고침)
+bowtie2-build GRCh38.99.fa index
+tophat -G Homo_sapiens.GRCh38.99.gtf --transcriptome-index=GRCh38.99.tr GRCh38.99 (dir GRCh38.99.tr 안에 Homo_sapiens.GRCh38.99 로 생김) 
 #tophat.sh 
 cat config | while read id
 do
