@@ -75,7 +75,7 @@ conda create -n agfusion
 conda activate agfusion 
 conda install python=3.5
 conda install pyensembl 
-pyensembl install --species homo_sapiens --release 84
+pyensembl install --species homo_sapiens --release 95
 #pyensembl install --species mus_musculus --release 87
 pip install agfusion
 agfusion download -g hg38
@@ -95,7 +95,7 @@ done
 agfusion batch \
 -f <star_fusion_tsv> \
 -a starfusion \
--db agfusion.homo_sapiens.84.db \
+-db agfusion.homo_sapiens.95.db \
 - <output_directory> \
 --middlestar \
 --noncanonical
