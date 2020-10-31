@@ -57,6 +57,7 @@ mkdir ./bwts
 /home/eunji/ref/GRCh38.99.tr/Homo_sapiens.GRCh38.99.tsv \
 ./bwts/ \
 /HDD2T/eunji/th/${id}/accepted_hits.bam /HDD2T/eunji/th/${id}/unmappeds.bam
+samtools index *.bam 
 
 #integrate-neo.py 
 /home/eunji/tool/integrate/integrate-neo.py -t hla.optitype -f fusions.bedpe -r ref.fa -g ref.genePred -k
