@@ -17,7 +17,7 @@ done
 
 conda create -n integrate-neo
 conda activate integrate-neo
-conda install bwa python gcc_linux-64 ucsc-gtftogenepred samtools bedtools matplotlib cmake 
+conda install bwa python=2 gcc_linux-64 ucsc-gtftogenepred samtools bedtools matplotlib cmake 
 wget ftp://ftp.ensembl.org/pub/release-99/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz
 wget ftp://ftp.ensembl.org/pub/release-99/gtf/homo_sapiens/Homo_sapiens.GRCh38.99.gtf.gz
 gtfToGenePred -genePredExt -geneNameAsName2 Homo_sapiens.GRCh38.99.gtf Homo_sapiens.GRCh38.99.genePred
