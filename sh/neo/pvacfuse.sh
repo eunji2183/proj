@@ -65,7 +65,7 @@ perl ../bin/HLAminer.pl -a ${id}.sam -h ../database/HLA_ABC_CDS.fasta -s 500
 
 
 #integrate-neo.py 
-/home/eunji/tool/integrate/integrate-neo.py -t hla.optitype -f fusions.bedpe -r ref.fa -g ref.genePred -k
+/home/eunji/tool/integrate/integrate-neo.py -t HLAminer_HPRA.csv -f fusions.bedpe -r ref.fa -g ref.genePred -k
 
 pvacfuse run \
 <example_data_dir>/fusions.bedpe.annot \
