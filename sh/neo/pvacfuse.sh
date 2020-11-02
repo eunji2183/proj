@@ -62,7 +62,7 @@ samtools index *.bam
 fusionBedpeAnnotator 
 -r /home/eunji/ref/GRCh38.99.tr/GRCh38_r99.all.fa 
 -g /home/eunji/ref/GRCh38.99.tr/Homo_sapiens.GRCh38.99.genePred 
--d ./difile.txt 
+-d /home/eunji/fusioncatcher/${id}.txt 
 -i  /home/eunji/rna/70615-MLS/fusions.bedpe
 -o ./fusions.annot.bedpe
 
