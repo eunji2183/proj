@@ -65,6 +65,13 @@ perl ../bin/HLAminer.pl -a ${id}.sam -h ../database/HLA_ABC_CDS.fasta -s 500
 
 
 #integrate-neo.py 
+python integrate-neo.py 
+-1 /home/eunji/tool/HLAminer-1.4/HLAminer_v1.4/70615-MLS/70615-MLS-R_1_val_1.fq.gz 
+-2 /home/eunji/tool/HLAminer-1.4/HLAminer_v1.4/70615-MLS/70615-MLS-R_2_val_2.fq.gz 
+-f /home/eunji/rna/70615-MLS/fusions.bedpe 
+-r /home/eunji/ref/GRCh38.99.tr/GRCh38_r99.all.fa 
+-g /home/eunji/ref/GRCh38.99.tr/Homo_sapiens.GRCh38.99.genePred -k
+
 /home/eunji/tool/integrate/integrate-neo.py -t HLAminer_HPRA.csv -f fusions.bedpe -r ref.fa -g ref.genePred -k
 
 pvacfuse run \
