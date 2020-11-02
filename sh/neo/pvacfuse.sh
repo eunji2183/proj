@@ -59,6 +59,11 @@ mkdir ./bwts
 /HDD2T/eunji/th/${id}/accepted_hits.bam /HDD2T/eunji/th/${id}/unmappeds.bam
 samtools index *.bam 
 
+#Hlaminer
+bwa mem -a ../database_bwamem/HLA_ABC_CDS.fasta ${id}-R_1_val_1.fq.gz ${id}-R_2_val_2.fq.gz > ${id}.sam
+perl ../bin/HLAminer.pl -a ${id}.sam -h ../database/HLA_ABC_CDS.fasta -s 500
+
+
 #integrate-neo.py 
 /home/eunji/tool/integrate/integrate-neo.py -t hla.optitype -f fusions.bedpe -r ref.fa -g ref.genePred -k
 
