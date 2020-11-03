@@ -83,10 +83,10 @@ python integrate-neo.py
 
 pvacfuse run \
 <example_data_dir>/fusions.bedpe.annot \
-Test \
+${id} \
 HLA-A*02:01,HLA-B*35:01,DRB1*11:01 \
 MHCflurry MHCnuggetsI MHCnuggetsII NNalign NetMHC PickPocket SMM SMMPMBEC SMMalign \
-<output_dir> \
+/home/eunji/proj/RMLS/rna/8.pvacfuse/integrate-neo/${id} \
 -e 8,9,10
 
 ------------------------------------------------------------------------------------------------------------------------------------
