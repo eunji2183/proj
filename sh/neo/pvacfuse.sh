@@ -132,10 +132,11 @@ MHCflurry MHCnuggetsI MHCnuggetsII NNalign NetMHC PickPocket SMM SMMPMBEC SMMali
 conda create -n fusioncatcher 
 conda activate fusioncatcher 
 conda install fusioncatcher
+download-human-db.sh
 #fusioncatcher.sh (700GB)
 cat config | while read id 
 do
 fusioncatcher.py -d /home/eunji/miniconda3/envs/fusioncatcher/share/fusioncatcher-1.20/db/human_v98/ 
--i /HDD2T/jeeh9/RMLS_RNA/trimmed_fq/Paired/ -o /HDD2T/eunji/fc/${id}/
+-i /HDD2T/eunji/${id}/ -o /HDD2T/eunji/fc/${id}/
 done
 
