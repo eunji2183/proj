@@ -22,7 +22,7 @@ DESeq2.1 <- function(count,group,ID){
   suppressMessages(library(DESeq2))
   suppressMessages(library(dplyr))
   suppressMessages(library(magrittr))
-  coldata <- data.frame(row.names = colnames(count),as.factor(group))
+  coldata <- data.frame(row.names = colnames(count),group)
   dds <- DESeqDataSetFromMatrix(countData = count,colData = coldata,design = ~group)
   dds <- DESeq(dds)
   res <- results(dds) 
