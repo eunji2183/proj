@@ -1,0 +1,91 @@
+#awk - pattern & 행동 
+
+keyword : BEGIN END
+pattern : {} 안에 
+NF : 읽을 필드 수.
+$1 , $2 , ... : 첫 번째 필드, 두 번째 필드
+$0 : 현재 입력 행;
+NR : 현재 줄 번호를 입력하십시오.
+OFS : 인쇄 할 때 필드를 조합하는 문자열.
+ORS : 출력 레코드 분리 기호, 기본적으로 개행 문자.
+RS : 라인 (레코드) 구분 기호를 입력하십시오. 기본값은 개행 문자입니다. FS 설정하십시오.
+IGNORECASE : FS와 RS에 영향을 미칩니다
+
+ex) coins.txt 
+gold     1    1986  USA                 American Eagle
+gold     1    1908  Austria-Hungary     Franz Josef 100 Korona
+silver  10    1981  USA                 ingot
+gold     1    1984  Switzerland         ingot
+gold     1    1979  RSA                 Krugerrand
+gold     0.5  1981  RSA                 Krugerrand
+gold     0.1  1986  PRC                 Panda
+silver   1    1986  USA                 Liberty dollar
+gold     0.25 1986  USA                 Liberty 5-dollar piece
+silver   0.5  1986  USA                 Liberty 50-cent piece
+silver   1    1987  USA                 Constitution dollar
+gold     0.25 1987  USA                 Constitution 5-dollar piece
+gold     1    1988  Canada              Maple Leaf
+1) gold 줄을 필터링하고 개수를 계산
+awk 'BEGIN {print "Coins"} /gold/{i++; print $0}  END {print i " lines out of " NR}' coins.txt
+Coins 
+gold     1    1986  USA                 American Eagle      
+gold     1    1908  Austria-Hungary     Franz Josef 100 Korona 
+gold     1    1984  Switzerland         ingot 
+gold     1    1979  RSA                 Krugerrand 
+gold     0.5  1981  RSA                 Krugerrand 
+gold     0.1  1986  PRC                 Panda                       
+gold     0.25 1986  USA                 Liberty 5-dollar piece
+gold     0.25 1987  USA                 Constitution 5-dollar piece
+gold     1    1988  Canada              Maple Leaf
+9 lines out of 13
+
+/gold/ 는 조건 , print $0 현재행 출력 
+
+awk 'BEGIN {print "First 3 coins"} NR<4' coins.txt 
+First 3 coins 
+앞 세줄 출력 
+
+awk '{printf ("%s \t %3.2f\n", $1, $2)}' coins.txt
+문자열 탭 세자리 소수점 두자리 줄바꿈 필드 1 2 출력 
+
+
+\'	작은따옴표
+\"	큰따옴표
+\?	물음표
+\\	백슬래시(\)
+\a	경고음 발생
+\b	백스페이스(backspace)
+\n	줄 바꿈(new line)
+\r	캐리지 리턴(carriage return)
+\t	수평 탭(tab)
+\v	수직 탭(tab)
+\f	폼 피드(form feed)
+
+%c	하나의 문자
+%s	문자열
+%d	부호 있는 10진 정수
+%i	부호 있는 10진 정수 (%d와 동일)
+%f	고정 소수점으로 표현한 실수 (소수점 이하 6자리까지 표현)
+%o	부호 없는 8진 정수
+%u	부호 없는 10진 정수
+%x	부호 없는 16진 정수 (소문자 사용)
+%X	부호 없는 16진 정수 (대문자 사용)
+%e	부동 소수점으로 표현한 실수 (e-표기법)
+%E	부동 소수점으로 표현한 실수 (E-표기법)
+%g	값에 따라 %f나 %e를 사용함.
+%G	값에 따라 %f나 %E를 사용함.
+%%	퍼센트(%) 기호 출력
+
+awk 'NR % 6'            # prints all lines except those divisible by 6
+awk 'NR > 5'            # prints from line 6 onwards (like tail -n +6, or sed '1,5d')
+awk '$2 == "foo"'       # prints lines where the second field is "foo"
+awk '$2 ~ /re/'         # prints lines where the 2nd field mateches the regex /re/
+awk 'NF >= 6'           # prints lines with 6 or more fields
+awk '/foo/ && !/bar/'   # prints lines that match /foo/ but not /bar/
+awk '/foo/ || /bar/'    # prints lines that match /foo/ or /bar/ (like grep -e 'foo' -e 'bar')
+awk '/foo/,/bar/'       # prints from line matching /foo/ to line matching /bar/, inclusive
+awk 'NF'                # prints only nonempty lines (or: removes empty lines, where NF==0)
+awk 'NF--'              # removes last field and prints the line
+
+
+
