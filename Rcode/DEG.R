@@ -20,7 +20,7 @@ ID <- gtf %>%
   dplyr::select(gene_id,gene_name) %>% distinct()
 save(ID,file="./data/ID.RData")
 
-group <- rep(c("con","upm"),c(2,2))
+group <- as.factor(rep(c("con","upm"),c(2,2)))
 count <- data(path = path)
 
 #DESeq2
