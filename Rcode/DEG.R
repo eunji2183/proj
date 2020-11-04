@@ -42,6 +42,20 @@ ggplot(resdata, aes(-log10(padj),log2FoldChange, col = DEG)) +
   theme_bw() +
   ggtitle("DEG(DESeq2) plot")
 
+#PCA 
+vsd <- vst(dds, blind=TRUE)
+png('./featurecounts/DESeq2/SDplot.png')
+meanSdPlot(assay(vsd))
+dev.off()
+pcaData <- plotPCA(vsd,intgroup=c("group","type"),returnData=TRUE)
+percentVar <- round(100*attr(pcaData,"percentVar"))
+png('./featurecounts/DESeq2/PCA.png')
+ggplot(pcaData,aes(PC1,PC2,color=group.1,shape=type)) +
+  geom_point(size=3) +
+  xlab(paste0("PC1: ",percentVar[1],"% variance")) +
+  ylab(paste0("PC2: ",percentVar[2],"% variance")) +
+  coord_fixed()
+dev.off()
 
 # m.value=log2FC  q.value=FDR(padj)
 tccRES <- DESeq2.2(count=count)
