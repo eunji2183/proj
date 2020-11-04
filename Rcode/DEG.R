@@ -33,12 +33,12 @@ ggplot(data = resdata, aes(x=log2FoldChange,y=-log10(padj),col = DEG)) +
   theme(panel.grid.minor = element_blank(),panel.grid.major = element_blank()) +
   geom_hline(yintercept=2 ,linetype=4) +
   geom_vline(xintercept=c(-1,1) ,linetype=4 ) +
-  scale_color_manual(name = "", values = c("red", "blue", "black"), limits = c("Up", "Down", "not")) +
+  scale_color_manual(name = "", values = c("red", "blue", "black"), limits = c("UP", "DOWN", "NOT")) +
   geom_label_repel(aes(label=sign), fontface="bold", color="grey50", box.padding=unit(0.35, "lines"), point.padding=unit(0.5, "lines"), segment.colour = "grey50")
 
 ggplot(resdata, aes(-log10(padj),log2FoldChange, col = DEG)) +
   geom_point(alpha = 0.5) +
-  scale_color_manual(name = "", values = c("red", "blue", "black"), limits = c("Up", "Down", "not")) +
+  scale_color_manual(name = "", values = c("red", "blue", "black"), limits = c("UP", "DOWN", "NOT")) +
   theme_bw() +
   ggtitle("DEG(DESeq2) plot")
 
