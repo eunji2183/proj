@@ -1,0 +1,1 @@
+cat Homo_sapiens.GRCh38.96.gtf | awk -F'\t' '{if($3=="gene") {split($9,a,";"); print a[1]"\t"$5-$4};}' | sed 's/[gene_id |"|]//g' > hg38_gene_length.txt 
