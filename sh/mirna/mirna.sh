@@ -1,5 +1,17 @@
 #miRNA analysis                                                                
                                                                                 
+wget ftp://mirbase.org/pub/mirbase/CURRENT/hairpin.fa.gz   ##　28645　reads
+wget ftp://mirbase.org/pub/mirbase/CURRENT/mature.fa.zip   ##   35828 reads 
+wget ftp://mirbase.org/pub/mirbase/CURRENT/hairpin.fa.zip
+wget ftp://mirbase.org/pub/mirbase/CURRENT/genomes/hsa.gff3 
+wget ftp://mirbase.org/pub/mirbase/CURRENT/miFam.dat.zip
+
+perl -alne '{if(/^>/){if(/Homo/){$tmp=1}else{$tmp=0}};next if $tmp!=1;s/U/T/g if !/>/;print }' hairpin.fa >hairpin.human.fa
+perl -alne '{if(/^>/){if(/Homo/){$tmp=1}else{$tmp=0}};next if $tmp!=1;s/U/T/g if !/>/;print }' mature.fa >mature.human.fa
+
+#index
+bowtie2-build hairpin.human.fa hairpin_human
+bowtie2-build mature.human.fa  mature_human
 
 #fastx_trimmer                                                                 
                                                                                 
