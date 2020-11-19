@@ -100,8 +100,10 @@ pyensembl install --species homo_sapiens --release 95
 pip install agfusion
 agfusion download -g hg38
 #agfusion download -g mm10
+conda create -n star-fusion 
 conda install star-fusion
 conda install star=2.7.1a
+conda install samtools=1.9
 #star-fusion index download(31GB)
 wget https://data.broadinstitute.org/Trinity/CTAT_RESOURCE_LIB/GRCh38_gencode_v33_CTAT_lib_Apr062020.plug-n-play.tar.gz
 #star-fusion.sh (RAM 32GB) (GRCh38/gencode_V33/ensembl_99)
