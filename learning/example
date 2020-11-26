@@ -5,3 +5,8 @@ ls | grep "SRR" | cut -d"_" -f 3-4,8 > sample
 ls | grep "SRR" | sed '1d' > SRR 
 paste SRR sample > SRR2sample
 cat SRR2sample | while read id; do arr=(${id}); SRR=${arr[0]}; sample=${arr[1]}; mv ./${SRR} ./${sample}; done 
+
+# config 만들기 (WES에서) 
+ls | grep "WES" | cut -d"_" -f 2-3 | sort -u > ../config 
+
+find ./*gz -size 1M | xargs rm
