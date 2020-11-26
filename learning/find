@@ -25,3 +25,4 @@ ex) find ./*gz -size 1M | xargs rm
 find . -name "*_1" -type f    #type 가 file 
 find . -size +1024c -size -2048c  # 1024 byte 보다 크고 2048 byte 보다 작은 파일 
 find . -name "*.tar.gz" -exec cp {} /mnt/usb/   #tar.gz 파일을 cp 
+find / -maxdepth 1 -name "sys"   #최대 하위 디렉토리 
