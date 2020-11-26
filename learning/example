@@ -1,1 +1,7 @@
 cat Homo_sapiens.GRCh38.96.gtf | awk -F'\t' '{if($3=="gene") {split($9,a,";"); print a[1]"\t"$5-$4};}' | sed 's/[gene_id |"|]//g' > hg38_gene_length.txt 
+
+#file 일괄처리 SRR file 에서 SRR... 떼고 sample 명으로만 파일이름을 교체 
+ls | grep "SRR" | cut -d"_" -f 3-4,8 > sample   
+ls | grep "SRR" | sed '1d' > SRR 
+paste SRR sample > SRR2sample
+cat SRR2sample | while read id; do arr=(${id}); SRR=${arr[0]}; sample=${arr[1]}; mv ./${SRR} ./${sample}; done 
