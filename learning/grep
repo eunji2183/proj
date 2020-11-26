@@ -33,26 +33,6 @@ ex) grep "\*" FILE.txt    파일에서 문자 * 검색 (\로 뒤에 문자를 �
 grep -v "\#" star-fusion.fusion_predictions.tsv | awk '{printf ("%s\n",$1)}' > 57257-NL.txt
 grep -v "\#" star-fusion.fusion_predictions.tsv | awk '{printf ("%s\n",$1)}' | sort -u > 75859-RMLS.txt
 
-----------------------------------------------------------------------------------------------------
-
-!!! sort 명령어 
-
--r reverse 내용을 역순으로 정렬
--n numeric 숫자 옵션으로 정렬
--u unique 
--R random 하게 섞음 
--c check 
--k 기준필드 
--t field separator 
-
-ex) sort -c -n sort.txt 
-    sort test -k1
-    grep -c test * | sort -t: -k2 -n -r   #grep 으로 파일별로 test가 몇번 나타나는지 체크한 후 , sort 로 빈도수 기준 정렬  
-  > tags:902
-    pacakes.json:1
-    generate.js:1
-    test.md:0
-
 -----------------------------------------------------------------------------------------------------------
 
 !!!perl 
