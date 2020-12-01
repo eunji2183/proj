@@ -48,7 +48,7 @@ First 3 coins
 awk '{printf ("%s \t %3.2f\n", $1, $2)}' coins.txt
 문자열 탭 세자리 소수점 두자리 줄바꿈 필드 1 2 출력 
 
-
+print 함수의 escape 문자 
 \'	작은따옴표
 \"	큰따옴표
 \?	물음표
