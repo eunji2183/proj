@@ -17,3 +17,6 @@ find ./*gz -size 1M | xargs rm
 #SRR1234  RNA_01  > SRR1234_1.fastq.gz RNA_01_1.fastq.gz 
                     SRR1234_2.fastq.gz RNA_01_2.fastq.gz 로 변경 
 cat id.txt | awk '{print $1"_1.fastq.gz""\t"$2"_1.fastq.gz""\n"$1"_2.fastq.gz""\t"$2"_2.fastq.gz"}' > id4.txt 
+
+#1-30행 삭제 , 필드 1 을 기준으로 unique, 2번째 열만 삭제 
+cat raw_count.txt | sed '1,30d' | sort -k1 -u | cut -f2 --complement  > rawcount.txt
