@@ -1,3 +1,5 @@
 #DESeq2 
 Error in DESeqDataSet(se, design = design, ignoreRank) : 
   some values in assay are negative
+b <- as.matrix(sapply(count, as.numeric))  
+row.names(b) <- rownames(count)
