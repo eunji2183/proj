@@ -148,7 +148,6 @@ sfit <- survfit(Surv(times, patient.vital_status)~admin.disease_code, data=clin)
 summary(sfit, times=seq(0,365*5,365))
 
 
-
 ################################################################################
 ##비례위험가정 만족여부 
 #kaplan-curve (cross-over 확인)
