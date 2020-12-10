@@ -25,3 +25,12 @@ sudo mount -a
 df -h
 sudo ln -s /proj2 /home/eunji/proj2  
 sudo chmod 777 proj2
+
+#top command 
+S -- Process Status
+    The status of the task which can be one of:
+      'D' = uninterruptible sleep
+      'R' = running
+      'S' = sleeping
+      'T' = traced or stopped
+      'Z' = zombie
