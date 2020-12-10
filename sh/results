@@ -3,3 +3,10 @@ RNA-seq : 보통 많은 gene 들이 copy number 되어 있어 duplication 제거
           UMI or random barcode 를 추가 했을경우 SE - seqkit , PE - UniqFast 로 duplication 제거 
 DNA-seq : Picard MarkDuplicates 로 remove , enzyme 으로 DNA 끊엇을 경우 duplication 제거 , ultrasound 일 경우 제거 안함 
 Chip-seq : 제거할 필요 없음 
+
+#STAR - rna seq
+quantMode option : default- genome level (RNA seq variant/mutation calling 할때 사용) 
+                   Transcript level - TranscriptomeSAM (RSEM transcript 분석할때 사용) 
+2-pass mapping 
+global approach : multi file 의 global index - sj.out.tab 
+local : one file local index - sj.out.tab - twopassMode 사용하면 genome 을 re-generate 하지 않고 자동분석 가능 
