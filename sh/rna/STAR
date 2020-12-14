@@ -1,5 +1,15 @@
 ## STAR 
 
+# genome generate 
+## sjdbOverhang = max read length -1 
+STAR --runMode genomeGenerate \
+--genomeDir STAR_index_GRCh38_ENSEMBL102 \
+--genomeFastaFiles Homo_sapiens.GRCh38.dna.primary_assembly.fa \
+--sjdbGTFfile Homo_sapiens.GRCh38.102.gtf \
+--sjdbOverhang 150 \
+--runThreadN 8
+
+
 # default 
 
 cat config | while read id 
