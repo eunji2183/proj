@@ -1,0 +1,32 @@
+## STAR 
+
+# default 
+
+cat config | while read id 
+do
+STAR \
+--runThreadN 6 \
+--genomeDir ../ref/STAR_index \
+--readFilesIn ../clean_fq/${id}_R1_val_1.fq.gz ../clean_fq/${id}_R2_val_2.fq.gz \
+--readFilesCommand zcat \
+--outSAMtype BAM Unsorted \
+--outFileNamePrefix ./default/${id}
+ done
+
+# 2-pass 
+
+cat config | while read id 
+do
+STAR \
+--runThreadN 6 \
+--genomeDir ../ref/STAR_index \
+--twopassMode Basic \
+--readFilesIn ../clean_fq/${id}_R1_val_1.fq.gz ../clean_fq/${id}_R2_val_2.fq.gz \
+--readFilesCommand zcat \
+--sjdbOverhang 150 \
+--outSAMtype BAM Unsorted \
+--quantMode geneCounts \
+--outFileNamePrefix ./2-pass/${id}
+ done
+
+
