@@ -24,18 +24,20 @@ STAR \
  done
 
 # 2-pass 
+## --quantMode TranscriptomeSAM GeneCounts > RSEM 위한 준비(TranscriptomeSAM) 
 
 cat config | while read id 
 do
 STAR \
 --runThreadN 6 \
---genomeDir ../ref/STAR_index \
+--genomeDir ../ref/STAR_index_GRCh38_ENSEMBL102 \
 --twopassMode Basic \
 --readFilesIn ../clean_fq/${id}_R1_val_1.fq.gz ../clean_fq/${id}_R2_val_2.fq.gz \
 --readFilesCommand zcat \
 --sjdbOverhang 150 \
 --outSAMtype BAM Unsorted \
---quantMode geneCounts \
+--chimOutType SeparateSAMold \
+--quantMode GeneCounts \
 --outFileNamePrefix ./2-pass/${id}
  done
 
