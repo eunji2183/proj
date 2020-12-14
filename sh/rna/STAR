@@ -35,7 +35,7 @@ STAR \
 --readFilesIn ../clean_fq/${id}_R1_val_1.fq.gz ../clean_fq/${id}_R2_val_2.fq.gz \
 --readFilesCommand zcat \
 --sjdbOverhang 150 \
---outSAMtype BAM Unsorted \
+--outSAMtype BAM SortedByCoordinate \
 --chimOutType SeparateSAMold \
 --quantMode GeneCounts \
 --outFileNamePrefix ./2-pass/${id}
