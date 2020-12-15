@@ -30,8 +30,11 @@ find . -maxdepth 2 -name "*.fastq.gz" | cut -d"/" -f3 | cut -d"_" -f 1-3 | sort 
 cat config | while read id ; do mkdir ${id} ; done
 
 #featurecount - file merge 
+(1)
 awk 'NF > 1{ a[$1] = a[$1]"\t"$7} END {for( i in a ) print i a[i]}' *.txt | grep -v "\#" | grep -v "Geneid" > merge.txt
-
+awk 'NF > 1{ a[$1] = a[$1]"\t"$7} END {for( i in a ) print i a[i]}' *.txt | grep -v "\#" | sed -n '/Geneid/p'  > sample.txt
+cat sample.txt merge.txt > output.txt
+(2)
 ls -1  *.txt | parallel 'cat {} | sed '1d' | cut -f7 {} > {/.}_clean.txt'
 ls -1  *.txt | head -1 | xargs cut -f1 > genes.txt
 paste genes.txt *_clean.txt | grep -v "\#" > output.txt
