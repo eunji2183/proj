@@ -34,8 +34,8 @@ cat config | while read id ; do mkdir ${id} ; done
 awk 'NF > 1{ a[$1] = a[$1]"\t"$7} END {for( i in a ) print i a[i]}' *.txt | grep -v "\#" | grep -v "Geneid" > merge.txt
 awk 'NF > 1{ a[$1] = a[$1]"\t"$7} END {for( i in a ) print i a[i]}' *.txt | grep -v "\#" | sed -n '/Geneid/p'  > sample.txt
 cat sample.txt merge.txt > output.txt
-(2)
-ls -1  *.txt | parallel 'cat {} | sed '1d' | cut -f7 {} > {/.}_clean.txt'
+(2) #parallel 중간에 command 작동안됨 
+ls -1  *.txt | parallel 'cat {} | sed '1d' | cut -f7 {} > {/.}_clean.txt'  
 ls -1  *.txt | head -1 | xargs cut -f1 > genes.txt
 paste genes.txt *_clean.txt | grep -v "\#" > output.txt
 
