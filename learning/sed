@@ -1,0 +1,4 @@
+
+sed -n '3,7p'  # 3-7 line output 
+sed '3,7d' # except 3-7 line 
+ 
