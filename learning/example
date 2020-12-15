@@ -31,3 +31,8 @@ cat config | while read id ; do mkdir ${id} ; done
 
 #featurecount - file merge 
 awk 'NF > 1{ a[$1] = a[$1]"\t"$7} END {for( i in a ) print i a[i]}' *.txt | grep -v "\#" | grep -v "Geneid" > merge.txt
+
+ls -1  *.txt | parallel 'cat {} | sed '1d' | cut -f7 {} > {/.}_clean.txt'
+ls -1  *.txt | head -1 | xargs cut -f1 > genes.txt
+paste genes.txt *_clean.txt | grep -v "\#" > output.txt
+
