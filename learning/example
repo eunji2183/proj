@@ -43,3 +43,12 @@ paste genes.txt *_clean.txt | grep -v "\#" > output.txt
 ls *ReadsPerGene.out.tab | parallel 'cat {} | sed '1,4d' > {/.}_clean.txt' 
 awk 'NF > 1{ a[$1] = a[$1]"\t"$2} END {for( i in a ) print i a[i]}' *ReadsPerGene.out_clean.txt  > merge.txt 
 cat sample.txt merge.txt > count.txt
+
+# GTF > gene id 변환 
+cat gencode.v19.genes.v7_model.patched_contigs.gtf | 
+awk 'BEGIN{FS="\t"}{split($9,a,";"); if($3~"gene") print a[1]"\t"a[3]"\t"$1":"$4"-"$5"\t"a[5]"\t"$7}' | 
+sed 's/gene_id "//' | sed 's/gene_id "//' | sed 's/gene_biotype "//'| sed 's/gene_name "//' | sed 's/gene_biotype "//' | sed 's/"//g' | sed 's/ //g' | 
+sed '1igene_id\tGeneSymbol\tChromosome\tClass\tStrand' > gene.txt
+
+
+
