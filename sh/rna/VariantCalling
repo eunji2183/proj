@@ -43,7 +43,7 @@ O=./ref/Homo_sapiens.GRCh38.dna.primary_assembly.dict
 # !!! conda install samtools==1.11
 samtools faidx Homo_sapiens.GRCh38.dna.primary_assembly.fa 
 
-#gatk SplitNCigarReads
+#gatk SplitNCigarReads AddOrReplaceReadGroups
 cat config | while read id
 do
 gatk SplitNCigarReads \
@@ -51,5 +51,30 @@ gatk SplitNCigarReads \
 -I ./STAR/2-pass/${id}_sorted_maked.bam \
 -O ./STAR/2-pass/${id}_sorted_maked_split.bam
 done
+cat config | while read id 
+do
+gatk AddOrReplaceReadGroups \
+-I ./STAR/2-pass_GRCh38_gencode_v33/${id}_sorted_maked_split.bam \
+-O ./STAR/2-pass_GRCh38_gencode_v33/${id}_split_add.bam \
+-LB ${id} -PL ILLUMINA -PU ${id} -SM ${id}
+done
 
-#
+#gatk BaseRecalibrator ApplyBQSR
+GENOME=/home/eunji/proj/PAAD/data/RNA/ref/hg38/Homo_sapiens_assembly38.fasta
+DBSNP=/home/eunji/proj/PAAD/data/RNA/ref/hg38/dbsnp_146.hg38.vcf.gz
+kgSNP=/home/eunji/proj/PAAD/data/RNA/ref/hg38/1000G_phase1.snps.high_confidence.hg38.vcf.gz
+kgINDEL=/home/eunji/proj/PAAD/data/RNA/ref/hg38/Mills_and_1000G_gold_standard.indels.hg38.vcf.gz
+cat config | while read id
+do
+gatk --java-options "-Xmx20G -Djava.io.tmpdir=./tmp" BaseRecalibrator \
+ -I ./STAR/2-pass_GRCh38_gencode_v33/${id}_sorted_maked_split.bam \
+ -R $GENOME \
+ -O ./STAR/2-pass_GRCh38_gencode_v33/${id}_recal.table --known-sites $kgSNP --known-sites $kgINDEL
+
+ gatk --java-options "-Xmx20G -Djava.io.tmpdir=./tmp" ApplyBQSR \
+ -I ./STAR/2-pass_GRCh38_gencode_v33/${id}_sorted_maked_split.bam \
+ -R $GENOME \
+ --output ./2-pass_GRCh38_gencode_v33/2-pass/${id}_recal.bam \
+ -bqsr ./STAR/2-pass_GRCh38_gencode_v33/${id}_recal.table
+ done
+
