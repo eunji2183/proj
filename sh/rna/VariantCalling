@@ -5,7 +5,7 @@ cat config | while read id
 do
 STAR \
 --runThreadN 6 \
---genomeDir ../ref/STAR_index_GRCh38_ENSEMBL102 \
+--genomeDir ../ref/STAR_index_GRCh38_gencode_v33 \
 --twopassMode Basic \
 --readFilesIn ../clean_fq/${id}_R1_val_1.fq.gz ../clean_fq/${id}_R2_val_2.fq.gz \
 --readFilesCommand zcat \
@@ -13,15 +13,16 @@ STAR \
 --outSAMtype BAM Unsorted \
 --chimOutType SeparateSAMold \
 --quantMode GeneCounts \
---outFileNamePrefix ./2-pass/${id}
+--outFileNamePrefix ./2-pass_GRCh38_gencode_v33/${id}
  done
+
 
 #picard AddOrReplaceReadGroups
 cat config | while read id 
 do
 picard AddOrReplaceReadGroups \
-I=./STAR/2-pass/${id}Aligned.out.bam \
-O=./STAR/2-pass/${id}_sorted.bam \
+I=./STAR/2-pass_GRCh38_gencode_v33/${id}Aligned.out.bam \
+O=./STAR/2-pass_GRCh38_gencode_v33/${id}_sorted.bam \
 SO=coordinate RGID=${id} RGLB=mRNA RGPL=illumina RGPU=HiSeq2500 RGSM=${id}
 done
 
@@ -29,28 +30,29 @@ done
 cat config | while read id 
 do
 picard MarkDuplicates \
-I=./STAR/2-pass/${id}_sorted.bam \
-O=./STAR/2-pass/${id}_sorted_maked.bam \
+I=./STAR/2-pass_GRCh38_gencode_v33/${id}_sorted.bam \
+O=./STAR/2-pass_GRCh38_gencode_v33/${id}_sorted_maked.bam \
 CREATE_INDEX=true \
 VALIDATION_STRINGENCY=SILENT \
-METRICS_FILE=./STAR/2-pass/${id}.metrics
+METRICS_FILE=./STAR/2-pass_GRCh38_gencode_v33/${id}.metrics
 done
 
 picard CreateSequenceDictionary \
-R=./ref/Homo_sapiens.GRCh38.dna.primary_assembly.fa \
-O=./ref/Homo_sapiens.GRCh38.dna.primary_assembly.dict 
+R=/home/eunji/proj/PAAD/data/RNA/ref/GRCh38_gencode_v33_CTAT_lib_Apr062020.plug-n-play/ctat_genome_lib_build_dir/ref_genome.fa \
+O=/home/eunji/proj/PAAD/data/RNA/ref/GRCh38_gencode_v33_CTAT_lib_Apr062020.plug-n-play/ctat_genome_lib_build_dir/ref_genome.dict
 
 # !!! conda install samtools==1.11
-samtools faidx Homo_sapiens.GRCh38.dna.primary_assembly.fa 
+samtools faidx /home/eunji/proj/PAAD/data/RNA/ref/GRCh38_gencode_v33_CTAT_lib_Apr062020.plug-n-play/ctat_genome_lib_build_dir/ref_genome.fa
 
 #gatk SplitNCigarReads AddOrReplaceReadGroups
 cat config | while read id
 do
 gatk SplitNCigarReads \
--R ./ref/Homo_sapiens.GRCh38.dna.primary_assembly.fa \
--I ./STAR/2-pass/${id}_sorted_maked.bam \
--O ./STAR/2-pass/${id}_sorted_maked_split.bam
+-R ./ref/GRCh38_gencode_v33_CTAT_lib_Apr062020.plug-n-play/ctat_genome_lib_build_dir/ref_genome.fa \
+-I ./STAR/2-pass_GRCh38_gencode_v33/${id}_sorted_maked.bam \
+-O ./STAR/2-pass_GRCh38_gencode_v33/${id}_sorted_maked_split.bam
 done
+
 cat config | while read id 
 do
 gatk AddOrReplaceReadGroups \
@@ -59,8 +61,9 @@ gatk AddOrReplaceReadGroups \
 -LB ${id} -PL ILLUMINA -PU ${id} -SM ${id}
 done
 
+
 #gatk BaseRecalibrator ApplyBQSR
-GENOME=/home/eunji/proj/PAAD/data/RNA/ref/hg38/Homo_sapiens_assembly38.fasta
+GENOME=/home/eunji/proj/PAAD/data/RNA/ref/GRCh38_gencode_v33_CTAT_lib_Apr062020.plug-n-play/ctat_genome_lib_build_dir/ref_genome.fa
 DBSNP=/home/eunji/proj/PAAD/data/RNA/ref/hg38/dbsnp_146.hg38.vcf.gz
 kgSNP=/home/eunji/proj/PAAD/data/RNA/ref/hg38/1000G_phase1.snps.high_confidence.hg38.vcf.gz
 kgINDEL=/home/eunji/proj/PAAD/data/RNA/ref/hg38/Mills_and_1000G_gold_standard.indels.hg38.vcf.gz
@@ -74,7 +77,7 @@ gatk --java-options "-Xmx20G -Djava.io.tmpdir=./tmp" BaseRecalibrator \
  gatk --java-options "-Xmx20G -Djava.io.tmpdir=./tmp" ApplyBQSR \
  -I ./STAR/2-pass_GRCh38_gencode_v33/${id}_sorted_maked_split.bam \
  -R $GENOME \
- --output ./2-pass_GRCh38_gencode_v33/2-pass/${id}_recal.bam \
+ --output ./STAR/2-pass_GRCh38_gencode_v33/${id}_recal.bam \
  -bqsr ./STAR/2-pass_GRCh38_gencode_v33/${id}_recal.table
  done
 
