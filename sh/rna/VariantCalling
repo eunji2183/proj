@@ -81,3 +81,27 @@ gatk --java-options "-Xmx20G -Djava.io.tmpdir=./tmp" BaseRecalibrator \
  -bqsr ./STAR/2-pass_GRCh38_gencode_v33/${id}_recal.table
  done
 
+GENOME=/home/eunji/proj/PAAD/data/RNA/ref/GRCh38_gencode_v33_CTAT_lib_Apr062020.plug-n-play/ctat_genome_lib_build_dir/ref_genome.fa
+DBSNP=/home/eunji/proj/PAAD/data/RNA/ref/hg38/dbsnp_146.hg38.vcf.gz
+cat config | while read id
+do
+gatk --java-options "-Xmx20G -Djava.io.tmpdir=./tmp" HaplotypeCalller \
+-R $GENOME \
+-I ./STAR/2-pass_GRCh38_gencode_v33/${id}_recal.bam \
+-O ./STAR/2-pass_GRCh38_gencode_v33/${id}.vcf \
+--dbSNP $DBSNP \
+--dont-use-soft-clipped-bases \
+-stand-call-conf 20.0
+done
+
+cat config | while read id 
+do
+gatk --java-options "-Xmx20G -Djava.io.tmpdir=./tmp" VariantFiltration \
+-R $GENOME \
+-V ./STAR/2-pass_GRCh38_gencode_v33/${id}.vcf \
+-window 35 \
+-cluster 3 \
+--filter-name FS -filter "FS > 30.0" \
+--filter-name QD -filter "QD < 2.0" \
+-O ./STAR/2-pass_GRCh38_gencode_v33/${id}_filtered.vcf
+done
