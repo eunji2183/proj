@@ -1,0 +1,13 @@
+#Affy SNP chip - ped/map 
+#ped/map > bed/bim/fam 
+./plink --file snp --make-bed --out snp
+
+#PCA 
+Plink  --threads 8 --bfile snp --pca 10 --out pca
+# --threads 线程数 --bfile 输入.bed文件 --pca 主成分的成分数 --out输出的文件名
+
+#Admixture population structure 
+for K in 2 3 4 5 6 7 8 9 10; \
+do admixture --cv hapmap3.bed $K | tee log${K}.out; done   #2 3 4 5 6 7 8 9 10分成的群体结构数 hapmap3.bed 输入文件
+
+grep -h CV log*.out  #查看最佳K值 输出最佳K值文件：hapmap3.3.Q
