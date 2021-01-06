@@ -105,3 +105,34 @@ gatk --java-options "-Xmx20G -Djava.io.tmpdir=./tmp" VariantFiltration \
 --filter-name QD -filter "QD < 2.0" \
 -O ./STAR/2-pass_GRCh38_gencode_v33/${id}_filtered.vcf
 done
+
+#annovar annotation 
+#download reference - hg38 version, clinvar_20200316, genomad_genome 등
+./annotate_variation.pl -downdb -buildver hg38 -webfrom annovar clinvar_20200316 humandb/  
+./annotate_variation.pl -downdb -buildver hg38 -webfrom annovar gnomad_genome humandb/
+
+#annovar annotation 
+
+cat config | while  read id
+do
+echo "start ANNOVAR for ${id} " `date`
+~/tool/annovar/table_annovar.pl ./STAR/2-pass_GRCh38_gencode_v33/${id}_filtered.vcf ~/tool/annovar/humandb/ \
+-buildver hg38 \
+-out ./STAR/annovar/${id} \
+-remove \
+-protocol refGene,knownGene,clinvar_20200316 \
+-operation g,g,f \
+-nastring . \
+-vcfinput
+echo "end ANNOVAR for ${id} " `date`
+done
+
+cat config | while read id
+do
+        grep -v '^Chr' ./STAR/annovar/${id}.hg38_multianno.txt | cut -f 1-20 | awk -v T=${id} -v N=${id:0:5}_germline '{print $0"\t"T"\t"N}'  
+        >./STAR/annovar/${id}.annovar.vcf
+done
+head -1 ./STAR/annovar/${id}.hg38_multianno.txt| sed 's/Otherinfo/Tumor_Sample_Barcode\tMatched_Norm_Sample_Barcode/' >./STAR/annovar/header
+
+cat ./STAR/annovar/header ./STAR/annovar/*annovar.vcf >./STAR/annovar/annovar_merge.vcf
+
