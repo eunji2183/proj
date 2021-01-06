@@ -1,11 +1,15 @@
 #awk - pattern & 행동 
+OPTION 
+
+-F 구분기호 지정 > cat a.txt | awk -F, '{print $1}' 
+
 
 keyword : BEGIN END
 pattern : {} 안에 
 NF : 읽을 필드 수.
 $1 , $2 , ... : 첫 번째 필드, 두 번째 필드
 $0 : 현재 입력 행;
-NR : 현재 줄 번호를 입력하십시오.
+NR : 현재 줄 번호를 입력하십시오.  > cat a.txt | awk -F, '{print NR " " $0;}' 
 OFS : 인쇄 할 때 필드를 조합하는 문자열.
 ORS : 출력 레코드 분리 기호, 기본적으로 개행 문자.
 RS : 라인 (레코드) 구분 기호를 입력하십시오. 기본값은 개행 문자입니다. FS 설정하십시오.
