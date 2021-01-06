@@ -2,6 +2,8 @@
 OPTION 
 
 -F 구분기호 지정 > cat a.txt | awk -F, '{print $1}' 
+-v 외부변수를 awk에 전달 
+ex) grep -v '^Chr' ./STAR/annovar/${id}.hg38_multianno.txt | cut -f 1-17 | awk -v S=${id} '{print $0"\t"S}'  
 
 
 keyword : BEGIN END
@@ -14,6 +16,14 @@ OFS : 인쇄 할 때 필드를 조합하는 문자열.
 ORS : 출력 레코드 분리 기호, 기본적으로 개행 문자.
 RS : 라인 (레코드) 구분 기호를 입력하십시오. 기본값은 개행 문자입니다. FS 설정하십시오.
 IGNORECASE : FS와 RS에 영향을 미칩니다
+
+ex) cat a.txt | awk -F, '{$1=="a"}' > a가 있는행 출력 , != 없는행 
+cat a.txt | awk -F, '$2~/^e/' > 2번째 컬럼에서 e로 시작하는 행 
+cat annovar_merge.vcf | awk '/3D_NR/' | awk '$6~/^exonic/'  > 3D_NR.vcf
+
+
+
+
 
 ex) coins.txt 
 gold     1    1986  USA                 American Eagle
