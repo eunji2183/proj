@@ -120,17 +120,17 @@ echo "start ANNOVAR for ${id} " `date`
 -buildver hg38 \
 -out ./STAR/annovar/${id} \
 -remove \
--protocol refGene,knownGene,clinvar_20200316 \
--operation g,g,f \
+-protocol refGene,avsnp147,clinvar_20200316,cosmic70 \
+-operation g,f,f,f \
 -nastring . \
 -vcfinput
 echo "end ANNOVAR for ${id} " `date`
 done
 
+
 cat config | while read id
 do
-        grep -v '^Chr' ./STAR/annovar/${id}.hg38_multianno.txt | cut -f 1-20 | awk -v T=${id} -v N=${id:0:5}_germline '{print $0"\t"T"\t"N}'  
-        >./STAR/annovar/${id}.annovar.vcf
+        grep -v '^Chr' ${id}.hg38_multianno.txt | cut -f 1-17 | awk -v S=${id} '{print $0"\t"S}' > ${id}.annovar.vcf
 done
 head -1 ./STAR/annovar/${id}.hg38_multianno.txt| sed 's/Otherinfo/Tumor_Sample_Barcode\tMatched_Norm_Sample_Barcode/' >./STAR/annovar/header
 
