@@ -135,4 +135,5 @@ done
 head -1 ./STAR/annovar/${id}.hg38_multianno.txt| sed 's/Otherinfo/Tumor_Sample_Barcode\tMatched_Norm_Sample_Barcode/' >./STAR/annovar/header
 
 cat ./STAR/annovar/header ./STAR/annovar/*annovar.vcf >./STAR/annovar/annovar_merge.vcf
+cat annovar_merge.vcf | awk '/3D_NR/' | awk '$6~/^exonic/'  > 3D_NR.vcf
 
