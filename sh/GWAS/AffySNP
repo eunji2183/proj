@@ -1,5 +1,8 @@
 #https://www.jianshu.com/p/53362fe881cd?utm_campaign=shakespeare
 
+#ped-map > VCF 
+plink --file toy --recode vcf --out toy_converted
+
 #Affy SNP chip - ped/map 
 #ped/map > bed/bim/fam 
 ./plink --file snp --make-bed --out snp
