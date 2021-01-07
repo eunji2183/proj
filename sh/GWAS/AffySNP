@@ -16,3 +16,6 @@ for K in 2 3 4 5 6 7 8 9 10; \
 do admixture --cv hapmap3.bed $K | tee log${K}.out; done   #2 3 4 5 6 7 8 9 10分成的群体结构数 hapmap3.bed 输入文件
 
 grep -h CV log*.out  #查看最佳K值 输出最佳K值文件：hapmap3.3.Q
+
+./run_pipeline.pl -SortGenotypeFilePlugin -inputFile ../data/ped-map/200624_1_1KG_8840.vcf -outputFile ../data/tassel/200624_1_1KG_8840 -fileType VCF
+
