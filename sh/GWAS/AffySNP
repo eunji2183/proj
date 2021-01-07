@@ -1,3 +1,5 @@
+#https://www.jianshu.com/p/53362fe881cd?utm_campaign=shakespeare
+
 #Affy SNP chip - ped/map 
 #ped/map > bed/bim/fam 
 ./plink --file snp --make-bed --out snp
