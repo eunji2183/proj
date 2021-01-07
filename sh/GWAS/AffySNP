@@ -1,4 +1,4 @@
-#https://www.jianshu.com/p/53362fe881cd?utm_campaign=shakespeare
+#https://blog.csdn.net/yijiaobani/article/details/60869998  > SNP to genotype 0 1 2 matrix 
 
 #ped-map > VCF 
 plink --file toy --recode vcf --out toy_converted
