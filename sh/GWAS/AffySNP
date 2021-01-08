@@ -7,6 +7,20 @@ plink --file toy --recode vcf --out toy_converted
 #ped/map > bed/bim/fam 
 ./plink --file snp --make-bed --out snp
 
+#QC 
+#missing rate 
+./plink2 --bfile ../data/1KG/200624_1_1KG_8840 --missing --out ../data/1KG/200624_1_1KG_8840
+#SNP & personal missing 
+./plink2 --bfile ../data/1KG/200624_1_1KG_8840 --geno 0.2 --make-bed --out ../data/1KG/1KG_2
+./plink2 --bfile ../data/1KG/1KG_2 --mind 0.2 --make-bed --out ../data/1KG/1KG_3 
+./plink2 --bfile ../data/1KG/1KG_3 --geno 0.02 --make-bed --out ../data/1KG/1KG_4
+./plink2 --bfile ../data/1KG/1KG_4 --mind 0.02 --make-bed --out ../data/1KG/1KG_5
+#sex discrepancy
+./plink2 --bfile ../data/1KG/1KG_5 --check-sex --out ../data/1KG/
+
+
+
+
 #PCA 
 Plink  --threads 8 --bfile snp --pca 10 --out pca
 # --threads 线程数 --bfile 输入.bed文件 --pca 主成分的成分数 --out输出的文件名
