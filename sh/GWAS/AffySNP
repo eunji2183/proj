@@ -1,5 +1,6 @@
 #https://blog.csdn.net/yijiaobani/article/details/60869998  > SNP to genotype 0 1 2 matrix 
-
+!!! https://cloud.tencent.com/developer/article/1593309?from=article.detail.1593312
+!!! https://cloud.tencent.com/developer/article/1593312?from=article.detail.1593309
 #ped-map > VCF 
 plink --file toy --recode vcf --out toy_converted
 
@@ -8,8 +9,6 @@ plink --file toy --recode vcf --out toy_converted
 ./plink --file snp --make-bed --out snp
 
 #QC 
-
-
 #missing rate 
 ./plink --bfile ../../data/Hapmap/200624_1_HapMap_8840 --missing --out ../../data/Hapmap/Hapmap_2
 #SNP & personal missing 
