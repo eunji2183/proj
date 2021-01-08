@@ -8,17 +8,33 @@ plink --file toy --recode vcf --out toy_converted
 ./plink --file snp --make-bed --out snp
 
 #QC 
+
+
 #missing rate 
-./plink2 --bfile ../data/1KG/200624_1_1KG_8840 --missing --out ../data/1KG/200624_1_1KG_8840
+./plink --bfile ../../data/Hapmap/200624_1_HapMap_8840 --missing --out ../../data/Hapmap/Hapmap_2
 #SNP & personal missing 
-./plink2 --bfile ../data/1KG/200624_1_1KG_8840 --geno 0.2 --make-bed --out ../data/1KG/1KG_2
-./plink2 --bfile ../data/1KG/1KG_2 --mind 0.2 --make-bed --out ../data/1KG/1KG_3 
-./plink2 --bfile ../data/1KG/1KG_3 --geno 0.02 --make-bed --out ../data/1KG/1KG_4
-./plink2 --bfile ../data/1KG/1KG_4 --mind 0.02 --make-bed --out ../data/1KG/1KG_5
+./plink --bfile ../../data/Hapmap/200624_1_HapMap_8840 --geno 0.2 --make-bed --out ../../data/Hapmap/Hapmap_2
+./plink --bfile ../../data/Hapmap/Hapmap_2 --mind 0.2 --make-bed --out ../../data/Hapmap/Hapmap_3
+./plink --bfile ../../data/Hapmap/Hapmap_3 --geno 0.02 --make-bed --out ../../data/Hapmap/Hapmap_4
+./plink --bfile ../../data/Hapmap/Hapmap_4 --mind 0.02 --make-bed --out ../../data/Hapmap/Hapmap_5
+
+
 #sex discrepancy
 ./plink2 --bfile ../data/1KG/1KG_5 --check-sex --out ../data/1KG/
 
+#统计最小等位基因频率
+./plink --bfile ../../data/Hapmap/Hapmap_5 --freq --out ../../data/Hapmap/MAF_check 
 
+#MAF < 0.05 
+./plink --bfile ../../data/Hapmap/Hapmap_5 --maf 0.05 --make-bed --out ../../data/Hapmap/Hapmap_6
+
+#检测不符合哈迪温伯格定律的snp
+./plink --bfile ../../data/Hapmap/Hapmap_6 --hardy --out ../../data/Hapmap/Hapmap_6
+awk '{ if ($9 <0.00001) print $0 }' Hapmap_6.hwe > Hapmap_6zoomhwe.hwe
+./plink --bfile ../../data/Hapmap/Hapmap_6 --hwe 1e-6 --make-bed --out ../../data/Hapmap/HapMap_hwe_filter_step1 
+./plink --bfile ../../data/Hapmap/HapMap_hwe_filter_step1 --hwe 1e-10 --hwe-all --make-bed --out ../../data/Hapmap/HapMap_7
+
+#LD region 
 
 
 #PCA 
