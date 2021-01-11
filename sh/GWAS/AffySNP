@@ -35,8 +35,25 @@ awk '{ if ($9 <0.00001) print $0 }' Hapmap_6.hwe > Hapmap_6zoomhwe.hwe
 
 #LD region 
 wget http://dougspeed.com/wp-content/uploads/highld.txt  #Chr37/hg19 assembly
+./plink --bfile ../../data/Hapmap/HapMap_7 --exclude ../../data/hi.txt --range --indep-pairwise 50 5 0.2 --out ../../data/Hapmap/indepSNP
+./plink --bfile ../../data/Hapmap/HapMap_7 --extract ../../data/Hapmap/indepSNP.prune.in --het --out ../../data/Hapmap/R_check 
+#R  选择杂合性超过平均值3个标准差的个体
+het <- read.table("./data/Hapmap/R_check.het", head=TRUE)
+het$HET_RATE = (het$"N.NM." - het$"O.HOM.")/het$"N.NM."
+het_fail = subset(het, (het$HET_RATE < mean(het$HET_RATE)-3*sd(het$HET_RATE)) | (het$HET_RATE > mean(het$HET_RATE)+3*sd(het$HET_RATE)))
+het_fail$HET_DST <- (het_fail$HET_RATE-mean(het$HET_RATE))/sd(het$HET_RATE)
+write.table(het_fail, "./data/Hapmap/fail-het-qc.txt", row.names=FALSE)
+sed 's/"// g' fail-het-qc.txt | awk '{print$1, $2}'> het_fail_ind.txt
+#在数据集中去除这个体
+./plink --bfile ../../data/Hapmap/HapMap_7 --remove ../../data/Hapmap/het_fail_ind.txt --make-bed --out ../../data/Hapmap/HapMap_8
+#检查个体间的亲缘关系 (kinship)
+./plink --bfile ../../data/Hapmap/HapMap_8 --extract ../../data/Hapmap/indepSNP.prune.in --genome --min 0.2 --out ../../data/Hapmap/pihat_min0.2
+awk '{ if ($8 >0.9) print $0 }' pihat_min0.2.genome > zoom_pihat.genome
 
-
+./plink --bfile ../../data/Hapmap/HapMap_8 --filter-founders --make-bed --out ../../data/Hapmap/HapMap_9
+./plink --bfile ../../data/Hapmap/HapMap_9 --extract ../../data/Hapmap/indepSNP.prune.in --genome --min 0.2 --out ../../data/Hapmap/pihat_min0.2_in_founders
+./plink --bfile ../../data/Hapmap/HapMap_9 --missing --out ../../data/Hapmap/HapMap_9
+./plink --bfile ../../data/Hapmap/HapMap_9 --remove ../../data/Hapmap/0.2_low_call_rate_pihat.txt --make-bed --out ../../data/Hapmap/HapMap_10
 
 #PCA 
 Plink  --threads 8 --bfile snp --pca 10 --out pca
