@@ -34,6 +34,8 @@ awk '{ if ($9 <0.00001) print $0 }' Hapmap_6.hwe > Hapmap_6zoomhwe.hwe
 ./plink --bfile ../../data/Hapmap/HapMap_hwe_filter_step1 --hwe 1e-10 --hwe-all --make-bed --out ../../data/Hapmap/HapMap_7
 
 #LD region 
+wget http://dougspeed.com/wp-content/uploads/highld.txt  #Chr37/hg19 assembly
+
 
 
 #PCA 
