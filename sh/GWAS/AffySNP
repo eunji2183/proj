@@ -65,10 +65,10 @@ wget ftp://ftp-trace.ncbi.nih.gov/1000genomes/ftp/release/20100804/ALL.2of4inter
 ./plink --bfile 1kG_MDS2 --geno 0.02 --allow-no-sex --make-bed --out 1kG_MDS3
 ./plink --bfile 1kG_MDS3 --mind 0.02 --allow-no-sex --make-bed --out 1kG_MDS4
 ./plink --bfile 1kG_MDS4 --maf 0.05 --allow-no-sex --make-bed --out 1kG_MDS5
-awk '{print$2}' HapMap_3_r3_12.bim > HapMap_SNPs.txt
+awk '{print$2}' HapMap_9.bim > HapMap_SNPs.txt
 ./plink --bfile 1kG_MDS5 --extract HapMap_SNPs.txt --make-bed --out 1kG_MDS6
 awk '{print$2}' 1kG_MDS6.bim > 1kG_MDS6_SNPs.txt
-./plink --bfile HapMap_3_r3_12 --extract 1kG_MDS6_SNPs.txt --recode --make-bed --out HapMap_MDS
+./plink --bfile ../../data/Hapmap/HapMap_9 --extract 1kG_MDS6_SNPs.txt --recode --make-bed --out HapMap_MDS
 awk '{print$2,$4}' HapMap_MDS.map > buildhapmap.txt
 ./plink --bfile 1kG_MDS6 --update-map buildhapmap.txt --make-bed --out 1kG_MDS7
 awk '{print$2,$5}' 1kG_MDS7.bim > 1kg_ref-list.txt
@@ -103,11 +103,24 @@ sed 's/CHS/ASN/g' race_1kG12.txt>race_1kG13.txt
 sed 's/PUR/AMR/g' race_1kG13.txt>race_1kG14.txt
 awk '{print$1,$2,"OWN"}' HapMap_MDS.fam>racefile_own.txt
 cat race_1kG14.txt racefile_own.txt | sed -e '1i\FID IID race' > racefile.txt
-awk '{ if ($4 <-0.04 && $5 >0.03) print $1,$2 }' MDS_merge2.mds > EUR_MDS_merge2
-plink --bfile HapMap_3_r3_12 --keep EUR_MDS_merge2 --make-bed --out HapMap_3_r3_13
-plink --bfile HapMap_3_r3_13 --extract indepSNP.prune.in --genome --out HapMap_3_r3_13
-plink --bfile HapMap_3_r3_13 --read-genome HapMap_3_r3_13.genome --cluster --mds-plot 10 --out HapMap_3_r3_13_mds
-awk '{print$1, $2, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13}' HapMap_3_r3_13_mds.mds > covar_mds.txt
+#MDS_merged.R 그린후 C1 C2 결과 보고 결정해야함 
+!! awk '{ if ($4 >-0.03 && $5 < 0.04) print $1,$2 }' MDS_merge2.mds > ASN_MDS_merge2
+
+./plink --bfile ../../data/Hapmap/HapMap_9 --keep ASN_MDS_merge2 --make-bed --out ../../data/Hapmap/HapMap_10
+./plink --bfile ../../data/Hapmap/HapMap_10 --extract ../../data/Hapmap/indepSNP.prune.in --genome --out ../../data/Hapmap/HapMap_10
+./plink --bfile ../../data/Hapmap/HapMap_10 --read-genome ../../data/Hapmap/HapMap_10.genome --cluster --mds-plot 10 --out ../../data/Hapmap/HapMap_10_mds
+awk '{print$1, $2, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13}' HapMap_10_mds.mds > covar_mds.txt
+
+#association 
+./plink --bfile ../../data/Hapmap/HapMap_10 --assoc --out ../../data/Hapmap/assoc_results
+./plink --bfile ../../data/Hapmap/HapMap_10 --covar ../../data/Hapmap/covar_mds.txt --logistic --hide-covar --out ../../data/Hapmap/logistic_results
+awk '!/'NA'/' logistic_results.assoc.logistic > logistic_results.assoc_2.logistic
+./plink --bfile ../../data/Hapmap/HapMap_10 -assoc --adjust --out ../../data/Hapmap/adjusted_assoc_results
+awk '{ if ($4 >= 21595000 && $4 <= 21605000) print $2 }' HapMap_10.bim > subset_snp_chr_22.txt
+./plink --bfile ../../data/Hapmap/HapMap_10 --extract ../../data/Hapmap/subset_snp_chr_22.txt --make-bed --out ../../data/Hapmap/HapMap_subset_for_perm
+./plink --bfile ../../data/Hapmap/HapMap_subset_for_perm --assoc --mperm 1000000 --out ../../data/Hapmap/subset_1M_perm_result
+sort -gk 4 subset_1M_perm_result.assoc.mperm > sorted_subset.txt
+head sorted_subset.txt
 
 
 #PCA 
