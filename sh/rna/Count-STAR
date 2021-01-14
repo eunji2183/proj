@@ -1,6 +1,17 @@
 #trim_galore - STAR - featurecount 
 
+mkdir clean_fq 
+ls Raw > config
+
 # trim_galore 
+cat config | while read id 
+do
+fq1=./Raw/${id}/${id}_1.fq.gz
+fq2=./Raw/${id}/${id}_2.fq.gz
+        echo "start trim_galore for ${id}" `date`
+        trim_galore  --paired --phred33 --length 30 --gzip --cores 8 -o ./clean_fq  $fq1  $fq2 >> ./clean_fq/${id}_trim.log 2>&1
+        echo "end trim_galore for ${id}" `date`
+done
 
 
 
