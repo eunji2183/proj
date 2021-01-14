@@ -13,5 +13,20 @@ fq2=./Raw/${id}/${id}_2.fq.gz
         echo "end trim_galore for ${id}" `date`
 done
 
+#STAR alignment
+cat config | while read id 
+do
+STAR \
+--runThreadN 6 \
+--genomeDir ../ref/STAR_index_GRCh38_ENSEMBL102 \
+ --readFilesIn ../clean_fq/${id}_1_val_1.fq.gz ../clean_fq/${id}_2_val_2.fq.gz \
+ --readFilesCommand zcat \
+ --sjdbOverhang 150 \
+ --outSAMtype BAM Unsorted \
+ --outFileNamePrefix ./default/${id}
+ done
+ 
+ #featurecount
+ 
 
 
