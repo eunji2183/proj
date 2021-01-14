@@ -26,7 +26,14 @@ STAR \
  --outFileNamePrefix ./default/${id}
  done
  
- #featurecount
- 
+#featurecount
+GTF=./ref/Homo_sapiens.GRCh38.102.gtf
+cat config | while read id
+do
+ echo "start featureCounts for ${id}" `date`
+ featureCounts -T 6 -p -t exon -g gene_id -a $GTF -o ./count/featurecount/${id}.txt ./STAR/default/${id}Aligned.out.bam
+ echo "end featureCounts for ${id}" `date`
+done
+
 
 
