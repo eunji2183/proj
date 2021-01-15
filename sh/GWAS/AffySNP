@@ -84,7 +84,7 @@ awk '{print$1}' uncorresponding_SNPs.txt | sort -u > SNPs_for_exlusion.txt
 ./plink --bfile corrected_hapmap --exclude SNPs_for_exlusion.txt --make-bed --out HapMap_MDS2
 ./plink --bfile 1kG_MDS7 --exclude SNPs_for_exlusion.txt --make-bed --out 1kG_MDS8
 ./plink --bfile HapMap_MDS2 --bmerge 1kG_MDS8.bed 1kG_MDS8.bim 1kG_MDS8.fam --allow-no-sex --make-bed --out MDS_merge2
-./plink --bfile MDS_merge2 --extract indepSNP.prune.in --genome --out MDS_merge2
+./plink --bfile MDS_merge2 --extract ../../data/Hapmap/indepSNP.prune.in --genome --out MDS_merge2
 ./plink --bfile MDS_merge2 --read-genome MDS_merge2.genome --cluster --mds-plot 10 --out MDS_merge2
 wget ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20100804/20100804.ALL.panel
 awk '{print$1,$1,$2}' 20100804.ALL.panel > race_1kG.txt
@@ -121,6 +121,11 @@ awk '{ if ($4 >= 21595000 && $4 <= 21605000) print $2 }' HapMap_10.bim > subset_
 ./plink --bfile ../../data/Hapmap/HapMap_subset_for_perm --assoc --mperm 1000000 --out ../../data/Hapmap/subset_1M_perm_result
 sort -gk 4 subset_1M_perm_result.assoc.mperm > sorted_subset.txt
 head sorted_subset.txt
+
+#PRS (polygenic risk score) 
+
+
+
 
 
 #PCA 
