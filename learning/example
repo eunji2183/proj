@@ -54,3 +54,7 @@ history | grep plink  #썻던 명령어 찾기
 
 #1열앞에 chr추가 & 뒤에 순서번호 추가  
 cat highLD.txt | awk  '{print "chr"$1,$2,$3,NR}' > hi.txt 
+
+#파일 위아래로 합치기 
+cat *_sample_sample2.txt | sort -u > control.txt
+
