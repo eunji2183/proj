@@ -123,8 +123,8 @@ sort -gk 4 subset_1M_perm_result.assoc.mperm > sorted_subset.txt
 head sorted_subset.txt
 
 #PRS (polygenic risk score) 
-
-
+Rscript PRSice.R --dir . --prsice ./PRSice_linux --base assoc_results.assoc 
+--target HapMap_10 --thread 1 --stat OR --binary-target T
 
 
 
