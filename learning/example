@@ -60,3 +60,9 @@ cat *_sample_sample2.txt | sort -u > control.txt
 
 #0/0 을 0으로 치환, ./. > NA,  0/1 > 1 , 1/1 > 2  , 특수문자 .과/앞에 \을 붙여야함
 cat sample.txt | sed 's/0\/0/0/g' | sed 's/0\/1/1/g' | sed 's/1\/1/2/g' | sed 's/\.\/\./NA/g' > sample2.txt
+
+#28번째 행만 추출 
+cat 200624_1_HapMap_8840.vcf | sed -n '28p' > vcf28.txt
+
+#열개수 > wc -w 
+
