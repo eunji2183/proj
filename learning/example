@@ -66,3 +66,5 @@ cat 200624_1_HapMap_8840.vcf | sed -n '28p' > vcf28.txt
 
 #열개수 > wc -w 
 
+#column 따라 file merge하기 
+join HapMap_10.fam PRSice.best | cut -d" " -f3-4 --complement | cut -d" " -f5-6 --complement > merge.txt
