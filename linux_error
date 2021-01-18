@@ -1,0 +1,6 @@
+#E: Package 'libssl1.0.0' has no installation candidate
+
+sudo gedit /etc/apt/sources.list
+deb http://security.ubuntu.com/ubuntu xenial-security main
+sudo apt update
+sudo apt install libssl1.0.0
