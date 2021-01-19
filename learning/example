@@ -71,3 +71,9 @@ join HapMap_10.fam PRSice.best | cut -d" " -f3-4 --complement | cut -d" " -f5-6 
 
 #공백구분자를 탭으로 변환
 cat merge.txt | sed 's/\ /\t/g' > merge2.txt
+
+#행열변환 
+cat head.txt | sed 's/\t/\n/g' > head2.txt
+
+#열행변환 
+tr -s '\n' '\t'< head4.txt > head5.txt
