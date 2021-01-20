@@ -77,3 +77,16 @@ cat head.txt | sed 's/\t/\n/g' > head2.txt
 
 #열행변환 
 tr -s '\n' '\t'< head4.txt > head5.txt
+
+#thread 추가  `` 안에 command 
+#!/bin/bash
+ th="20"
+for ((i=7601;i<=7800;i++));do
+j=`cut -f $i merge.vcf > $i.vcf`
+  if [[ $j -ge $th ]];then
+    until [[ $j -lt $th ]]
+      do j=`cut -f $i merge.vcf > $i.vcf`
+      done
+  fi
+done
+
