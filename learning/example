@@ -90,3 +90,10 @@ j=`cut -f $i merge.vcf > $i.vcf`
   fi
 done
 
+#htseq-count file merge 
+awk 'NF > 1{ a[$1] = a[$1]"\t"$2} END {for( i in a ) print i a[i]}' *.txt | sort -k1 > merge.txt
+ls | grep "htseq_counts" | cut -d"_" -f 1-2  > sample.txt
+tr -s '\n' '\t'< sample.txt > head.txt
+cat head.txt merge.txt | grep -v '^_' > out.txt
+
+
