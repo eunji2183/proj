@@ -15,3 +15,4 @@ ex) sort -c -n sort.txt
     pacakes.json:1
     generate.js:1
     test.md:0
+ls | grep "vcf" | sort -t_ -k1 -n > sample4.txt
