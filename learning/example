@@ -96,4 +96,6 @@ ls | grep "htseq_counts" | cut -d"_" -f 1-2  > sample.txt
 tr -s '\n' '\t'< sample.txt > head.txt
 cat head.txt merge.txt | grep -v '^_' > out.txt
 
-
+#echo 
+echo -e "cat xaa | while read id ; do  awk -v T=\${id} '{print \$0\"\\\t\"T}' \${id}.vcf > ../8840_4/\${id}.vcf ; done"
+결과 : cat xaa | while read id ; do  awk -v T=${id} '{print $0"\t"T}' ${id}.vcf > ../8840_4/${id}.vcf ; done
