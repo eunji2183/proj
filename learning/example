@@ -103,3 +103,5 @@ echo -e "cat xaa | while read id ; do  awk -v T=\${id} '{print \$0\"\\\t\"T}' \$
 cat config.txt | while read id ; 
 do echo -e "cat ${id} | while read id ; do  awk -v T=\${id} '{print \$0\"\\\t\"T}' \${id}.vcf > ../8840_4/\${id}.vcf ; done" > ./8840_3/${id}.sh ; done
 
+#awk nohup 문장 만들기 
+cat config.txt | awk '{printf "nohup bash %s.sh &\n",$1}' > bash.txt
