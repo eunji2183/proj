@@ -105,3 +105,6 @@ do echo -e "cat ${id} | while read id ; do  awk -v T=\${id} '{print \$0\"\\\t\"T
 
 #awk nohup 문장 만들기 
 cat config.txt | awk '{printf "nohup bash %s.sh &\n",$1}' > bash.txt
+
+#한개 파일 200행 씩 나누어 여러파일에 
+split -l 200 config
