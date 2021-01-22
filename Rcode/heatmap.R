@@ -90,3 +90,18 @@ pheatmap(heat,scale="row",color = colorRampPalette(c("navy", "white", "firebrick
          border="white",cluster_cols = T,cluster_rows = F,
          annotation_row = annotation_row,annotation_legend = T)
 
+#z-score 상하선 정하기 
+pheatmap(dat)
+n=t(scale(t(dat)))
+n[n>2]=2 #限定上限，使表达量大于2的等于2
+n[n< -2]= -2 #限定下限，使表达量小于-2的等于-2
+n[1:4,1:4]
+pheatmap(n,show_colnames =F,show_rownames = F)
+ac=data.frame(group=cluster)
+rownames(ac)=colnames(n)
+pheatmap(n,annotation_col = ac,
+         show_colnames =F,show_rownames = T)
+n[n< -1]= -1 # 重新限定下限，使表达量小于-2的等于-2
+n[1:4,1:4] 
+pheatmap(n,annotation_col = ac,
+         show_colnames =F,show_rownames = T)
