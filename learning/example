@@ -111,3 +111,6 @@ split -l 200 config
 
 #awk 뒤에 . 붙히기 
 awk '{print $0 "\t"".""\t""."}' exonic.vcf > exo.vcf
+
+awk '$12 !~ /0\/0/' exo7.vcf > exo8.vcf
+awk '$12 !~ /\.\/\./' exo8.vcf > exo9.vcf
