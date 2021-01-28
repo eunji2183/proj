@@ -164,3 +164,4 @@ GO_KEGG <- function(res,p,FC){
   EGG <- enrichKEGG(gene = de,organism = 'hsa',pvalueCutoff = 0.05)
   return(list(go,EGG))
 }
+                  
