@@ -104,7 +104,7 @@ fpkmToTpm <- function(fpkm)
 {
   exp(log(fpkm) - log(sum(fpkm)) + log(1e6))
 }                  
-
+tpms <- apply(dat,2,fpkmToTpm)
 
 #df=resdata(dataframe) , gene=gene(character), raw=count
 heatmap <- function(df,gene,raw){
