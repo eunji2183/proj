@@ -98,7 +98,14 @@ tpm <- function(counts,lengths){
   rpk/coef
 } 
 #tpms <- apply(counts,2,function(x)tpm(x,genes$gene_length))
-                  
+
+#fpkm to tpm                   
+fpkmToTpm <- function(fpkm)
+{
+  exp(log(fpkm) - log(sum(fpkm)) + log(1e6))
+}                  
+
+
 #df=resdata(dataframe) , gene=gene(character), raw=count
 heatmap <- function(df,gene,raw){
   suppressMessages(library(magrittr))
