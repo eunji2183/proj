@@ -14,4 +14,4 @@ data <- lapply(filenames,function(x){
              encoding="UTF-8",fileEncoding = "CP949" )})
 count <- Reduce(function(x,y)merge(x,y,by="DIST_ID"),data)
 
-write.csv(count,file = "./EXCEL/1/merge.csv",sep = ",",row.names = F)
+write.csv(count,file = "./EXCEL/1/merge.csv",row.names = F)
