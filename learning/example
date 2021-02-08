@@ -123,3 +123,7 @@ cut -f '2-13' $i |sed '1d' | sed "s/$/\t${i%%.*}/" >> all_annovar
 done
 grep -P "\texonic\t" all_annovar > all_annovar2
 sed -i '1s/^/Chr\tStart\tEnd\tRef\tAlt\tFunc.refGene\tGene.refGene\tGeneDetail.refGene\tExonicFunc.refGene\tAAChange.refGene\tTumor_Sample_Barcode\n/' all_annovar2
+
+cat con | while read id; do awk -F ' ' '{print $1" "$2" "$3"\t"$3}' ${id}.txt  > ${id}_2.txt; done
+cat con | while read id; do rm {id}.txt; mv ${id}_2.txt ${id}.txt; done
+
