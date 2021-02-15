@@ -126,4 +126,5 @@ sed -i '1s/^/Chr\tStart\tEnd\tRef\tAlt\tFunc.refGene\tGene.refGene\tGeneDetail.r
 
 cat con | while read id; do awk -F ' ' '{print $1" "$2" "$3"\t"$3}' ${id}.txt  > ${id}_2.txt; done
 cat con | while read id; do rm {id}.txt; mv ${id}_2.txt ${id}.txt; done
+cat config | while read id; do echo "IID ${id}" > ${id}_head.txt ; done
 
