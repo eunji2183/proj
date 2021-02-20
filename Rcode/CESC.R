@@ -148,7 +148,6 @@ ggscatter(tnorm, x = "HDAC8", y = "HDAC6",
 cor.test(tnorm$HDAC8, tnorm$HDAC6, 
                 method = "pearson")
 
-
 #OS survival 
 HDAC6 <- tnorm %>%
   dplyr::select(HDAC6)
@@ -177,6 +176,8 @@ os$HPV_group <- ifelse(os$HPV == 0,"NO",
 
 save(tnorm,file = "./data/tnorm.RData")
 save(os,file = "./data/os.RData")
+
+
 #quantile survival analysis 
 os_quan <- os %>%
   dplyr::filter(quan_group == "High" | quan_group == "Low")
@@ -186,8 +187,8 @@ sfit <- survfit(Surv(OS.Time,OS)~quan_group,data = os_quan)
 sfit <- survfit(Surv(PFI.Time,PFI)~quan_group,data = os_quan)
 ggsurvplot(sfit,pval = TRUE)
 ggsurvplot(
-  sfit,
-  data = os_quan,
+  stage1fit,
+  data = stage1,
   size = 1,                 # change line size
   palette =
     c("#FF0000", "#0000FF"),# custom color palettes
@@ -202,7 +203,7 @@ ggsurvplot(
   risk.table.height = 0.18, # Useful to change when you have multiple groups
   ggtheme = theme_classic()      # Change ggplot2 theme
 ) +
-  ggtitle("PFI-HDAC6")
+  ggtitle("CESC HPV(-) stageI-HDAC6")
 
 ggsurvplot(
   stage4fit,
@@ -220,7 +221,7 @@ ggsurvplot(
   surv.scale="percent",
   palette = c("#FF0000", "#0000FF"),
   legend  = c(0.15,0.4),
-  legend.title = "quartile",
+  legend.title = "zscore",
   legend.labs = c("High", "Low"),
   conf.int.style = "step",
   risk.table = T,        # Add risk table
@@ -230,12 +231,12 @@ ggsurvplot(
   ggtheme = theme_bw(),# Change ggplot2 theme
   tables.theme = theme_cleantable()
 ) +
-  ggtitle("CESC stageIV-HDAC6")
+  ggtitle("CESC stageIII-HDAC6")
 
 
 ggsurvplot(
-  stage4fit,
-  data = stage4,
+  stage1fit,
+  data = stage1,
   size = 1,       # change line size
   conf.int = F,  # Add confidence interval
   pval = TRUE, # Add p-value
@@ -249,7 +250,7 @@ ggsurvplot(
   surv.scale="percent",
   palette = c("#FC4E07","#2E9FDF"),
   legend  = c(0.15,0.4),
-  legend.title = "quartile",
+  legend.title = "zscore",
   legend.labs = c("High", "Low"),
   conf.int.style = "step",
   risk.table = T,        # Add risk table
@@ -259,7 +260,7 @@ ggsurvplot(
   ggtheme = theme_bw(),# Change ggplot2 theme
   tables.theme = theme_cleantable()
 ) +
-  ggtitle("CESC stageIV-HDAC6")
+  ggtitle("CESC stageI-HDAC6")
 
                        
                       
@@ -275,3 +276,192 @@ stage1fit <- survfit(Surv(OS.Time,OS)~quan_group,data = stage1)
 stage2fit <- survfit(Surv(OS.Time,OS)~quan_group,data = stage2)
 stage3fit <- survfit(Surv(OS.Time,OS)~quan_group,data = stage3)
 stage4fit <- survfit(Surv(OS.Time,OS)~quan_group,data = stage4)
+ggsurvplot(stage1fit,pval = TRUE,risk.table = TRUE)
+ggsurvplot(
+  stage3fit,
+  data = stage3,
+  size = 1,                 # change line size
+  palette =
+    c("#E7B800", "#2E9FDF"),# custom color palettes
+  conf.int = T,          # Add confidence interval
+  pval = TRUE,              # Add p-value
+  risk.table = TRUE,        # Add risk table
+  risk.table.col = "strata",# Risk table color by groups
+  legend.labs =
+    c("High", "Low"),    # Change legend labels
+  risk.table.height = 0.18, # Useful to change when you have multiple groups
+  ggtheme = theme_classic()      # Change ggplot2 theme
+)
+
+#stage - PFI
+fit <- coxph(Surv(PFI.Time,PFI)~stage_group+HDAC6,data = os_quan)
+stage <- survfit(Surv(PFI.Time,PFI)~quan_group+strata(os_quan$stage_group),data = os_quan)
+stage1 <- os_quan %>% dplyr::filter(stage_group == 1)
+stage2 <- os_quan %>% dplyr::filter(stage_group == 2)
+stage3 <- os_quan %>% dplyr::filter(stage_group == 3)
+stage4 <- os_quan %>% dplyr::filter(stage_group == 4)
+stage1fit <- survfit(Surv(PFI.Time,PFI)~quan_group,data = stage1)
+stage2fit <- survfit(Surv(PFI.Time,PFI)~quan_group,data = stage2)
+stage3fit <- survfit(Surv(PFI.Time,PFI)~quan_group,data = stage3)
+stage4fit <- survfit(Surv(PFI.Time,PFI)~quan_group,data = stage4)
+
+
+##zscore -survival 
+require("survival")
+sfit <- survfit(Surv(OS.Time,OS)~zscore_group,data = os)
+sfit <- survfit(Surv(PFI.Time,PFI)~zscore_group,data = os)
+ggsurvplot(
+  sfit,
+  data = os_zscore,
+  size = 1,                 # change line size
+  palette =
+    c("#E7B800", "#2E9FDF"),# custom color palettes
+  conf.int = TRUE,          # Add confidence interval
+  pval = TRUE,              # Add p-value
+  risk.table = TRUE,        # Add risk table
+  risk.table.col = "strata",# Risk table color by groups
+  legend.labs =
+    c("High", "Low"),    # Change legend labels
+  risk.table.height = 0.18, # Useful to change when you have multiple groups
+  ggtheme = theme_classic()      # Change ggplot2 theme
+)
+
+#stage -OS
+fit <- coxph(Surv(OS.Time,OS)~stage_group+HDAC6,data = os)
+stage <- survfit(Surv(OS.Time,OS)~zscore_group+strata(os$stage_group),data = os)
+ggsurvplot(stage,pval = TRUE)
+stage1 <- os %>% dplyr::filter(stage_group == 1)
+stage2 <- os %>% dplyr::filter(stage_group == 2)
+stage3 <- os %>% dplyr::filter(stage_group == 3)
+stage4 <- os %>% dplyr::filter(stage_group == 4)
+stage1fit <- survfit(Surv(OS.Time,OS)~zscore_group,data = stage1)
+stage2fit <- survfit(Surv(OS.Time,OS)~zscore_group,data = stage2)
+stage3fit <- survfit(Surv(OS.Time,OS)~zscore_group,data = stage3)
+stage4fit <- survfit(Surv(OS.Time,OS)~zscore_group,data = stage4)
+ggsurvplot(stage1fit,pval = TRUE,risk.table = TRUE)
+
+#stage -PFI
+
+fit <- coxph(Surv(PFI.Time,PFI)~stage_group+HDAC6,data = os_zscore)
+stage <- survfit(Surv(PFI.Time,PFI)~zscore_group+strata(os_zscore$stage_group),data = os_zscore)
+ggsurvplot(stage,pval = TRUE)
+stage1 <- os_zscore %>% dplyr::filter(stage_group == 1)
+stage2 <- os_zscore %>% dplyr::filter(stage_group == 2)
+stage3 <- os_zscore %>% dplyr::filter(stage_group == 3)
+stage4 <- os_zscore %>% dplyr::filter(stage_group == 4)
+stage1fit <- survfit(Surv(PFI.Time,PFI)~zscore_group,data = stage1)
+stage2fit <- survfit(Surv(PFI.Time,PFI)~zscore_group,data = stage2)
+stage3fit <- survfit(Surv(PFI.Time,PFI)~zscore_group,data = stage3)
+stage4fit <- survfit(Surv(PFI.Time,PFI)~zscore_group,data = stage4)
+ggsurvplot(stage1fit,pval = TRUE,risk.table = TRUE)
+ggsurvplot(
+  stage1fit,
+  data = stage1,
+  size = 1,                 # change line size
+  palette =
+    c("#E7B800", "#2E9FDF"),# custom color palettes
+  conf.int = TRUE,          # Add confidence interval
+  pval = TRUE,              # Add p-value
+  risk.table = TRUE,        # Add risk table
+  risk.table.col = "strata",# Risk table color by groups
+  legend.labs =
+    c("High", "Low"),    # Change legend labels
+  risk.table.height = 0.18, # Useful to change when you have multiple groups
+  ggtheme = theme_classic()      # Change ggplot2 theme
+)
+
+#HPV- quartile  
+os_HPV <- os %>%
+  dplyr::filter(HPV_group == "YES")
+no_HPV <- os %>%
+  dplyr::filter(HPV_group == "NO")
+quan_HPV <- os_HPV %>%
+  dplyr::filter(quan_group == "High" | quan_group == "Low")
+quan_no <- no_HPV %>%
+  dplyr::filter(quan_group == "High" | quan_group == "Low")
+
+require("survival")
+sfit <- survfit(Surv(OS.Time,OS)~quan_group,data = quan_no)
+sfit <- survfit(Surv(PFI.Time,PFI)~quan_group,data = quan_no)
+ggsurvplot(sfit,pval = TRUE)
+ggsurvplot(
+  sfit,
+  data = quan_HPV,
+  size = 1,                 # change line size
+  palette =
+    c("#FF0000", "#0000FF"),# custom color palettes
+  conf.int = F,          # Add confidence interval
+  pval = TRUE,              # Add p-value
+  risk.table = TRUE,        # Add risk table
+  risk.table.col = "strata",# Risk table color by groups
+  legend.labs =
+    c("High", "Low"),    # Change legend labels
+  risk.table.height = 0.18, # Useful to change when you have multiple groups
+  ggtheme = theme_classic()      # Change ggplot2 theme
+)
+
+#stage -OS
+fit <- coxph(Surv(OS.Time,OS)~stage_group+HDAC6,data = os_quan)
+stage <- survfit(Surv(OS.Time,OS)~quan_group+strata(quan_no$stage_group),data = quan_no)
+ggsurvplot(stage,pval = TRUE)
+stage1 <- quan_no %>% dplyr::filter(stage_group == 1)
+stage2 <- quan_no %>% dplyr::filter(stage_group == 2)
+stage3 <- quan_no %>% dplyr::filter(stage_group == 3)
+stage4 <- quan_no %>% dplyr::filter(stage_group == 4)
+stage1fit <- survfit(Surv(OS.Time,OS)~quan_group,data = stage1)
+stage2fit <- survfit(Surv(OS.Time,OS)~quan_group,data = stage2)
+stage3fit <- survfit(Surv(OS.Time,OS)~quan_group,data = stage3)
+stage4fit <- survfit(Surv(OS.Time,OS)~quan_group,data = stage4)
+ggsurvplot(
+  stage1fit,
+  data = stage1,
+  size = 1,                 # change line size
+  palette =
+    c("#FF0000", "#0000FF"),# custom color palettes
+  conf.int = F,          # Add confidence interval
+  pval = TRUE,              # Add p-value
+  risk.table = TRUE,        # Add risk table
+  risk.table.col = "strata",# Risk table color by groups
+  legend.labs =
+    c("High", "Low"),    # Change legend labels
+  risk.table.height = 0.18, # Useful to change when you have multiple groups
+  ggtheme = theme_classic()      # Change ggplot2 theme
+)
+
+#stage - PFI
+fit <- coxph(Surv(PFI.Time,PFI)~stage_group+HDAC6,data = os_quan)
+stage <- survfit(Surv(PFI.Time,PFI)~quan_group+strata(quan_no$stage_group),data = quan_no)
+
+stage1fit <- survfit(Surv(PFI.Time,PFI)~quan_group,data = stage1)
+stage2fit <- survfit(Surv(PFI.Time,PFI)~quan_group,data = stage2)
+stage3fit <- survfit(Surv(PFI.Time,PFI)~quan_group,data = stage3)
+stage4fit <- survfit(Surv(PFI.Time,PFI)~quan_group,data = stage4)
+
+
+#except stage3 
+os_124 <- os %>%
+  dplyr::filter(stage_group != 3) %>%
+  dplyr::filter(quan_group == "High" | quan_group == "Low")
+os_12 <- os %>%
+  dplyr::filter(stage_group == 1 | stage_group == 2) %>%
+  dplyr::filter(quan_group == "High" | quan_group == "Low")
+require("survival")
+sfit <- survfit(Surv(OS.Time,OS)~zscore_group,data = os_124)
+sfit <- survfit(Surv(PFI.Time,PFI)~zscore_group,data = os_124)
+ggsurvplot(sfit,pval = TRUE)
+ggsurvplot(
+  sfit,
+  data = os_124,
+  size = 1,                 # change line size
+  palette =
+    c("#FF0000", "#0000FF"),# custom color palettes
+  conf.int = F,          # Add confidence interval
+  pval = TRUE,              # Add p-value
+  risk.table = TRUE,        # Add risk table
+  risk.table.col = "strata",# Risk table color by groups
+  legend.labs =
+    c("High", "Low"),    # Change legend labels
+  risk.table.height = 0.18, # Useful to change when you have multiple groups
+  ggtheme = theme_classic()      # Change ggplot2 theme
+)
+
