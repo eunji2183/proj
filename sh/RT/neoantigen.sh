@@ -13,3 +13,6 @@ do
 	time pigz -p 10 -f ./raw_fq/${id}_1.fastq >./raw_fq/${id}_1.fastq.gz
 	time pigz -p 10 -f ./raw_fq/${id}_2.fastq >./raw_fq/${id}_2.fastq.gz
 done 
+
+gunzip *.gz 
+samtools fqidx *.fastq
