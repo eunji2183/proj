@@ -12,18 +12,21 @@ mkpart primary 0GB 3000GB
 q
 
 # <2TB 
-sudo fdisk /dev/sdc
+su
+fdisk -l
+fdisk /dev/sdb
 n p 1 enter enter p w 
 
-mkfs.ext4 /dev/sdc1
-sudo blkid #UUID copy 
-sudo mkdir /proj2 
-sudo vim /etc/fstab
+mkfs -t ext4 /dev/sdb1
+blkid #UUID copy 
+mkdir /proj2 
+vim /etc/fstab
 UUID=583eb4bb-6f91-4634-b6f3-088157ae2010 /home/eunji/proj2 ext4 defaults 0 0
 wq
-sudo mount -a 
+mount /dev/sdb1 /proj2
+mount
 df -h
-sudo ln -s /proj2 /home/eunji/proj2  
+ln -s /proj2 /home/eunji/proj2  
 sudo chmod 777 proj2
 
 #top command 
