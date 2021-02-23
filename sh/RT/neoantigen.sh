@@ -19,4 +19,9 @@ samtools fqidx *.fastq
 
 barcode_splitter --bcfile ../barcode.txt ../raw_fq/ATM_UN2_2.fastq.gz --gzipin --gzipout --idxread 1 --suffix .fastq
 
+## fastp trim 
+cat config | while read id
+do
+        fastp -i ./raw_fq/${id}_1.fastq.gz -o ./trim_fq/${id}_1.fastq.gz -I ./raw_fq/${id}_2.fastq.gz -O ./trim_fq/${id}_2.fastq.gz --thread=16
+done
 
