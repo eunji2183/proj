@@ -18,3 +18,5 @@ gunzip *.gz
 samtools fqidx *.fastq
 
 barcode_splitter --bcfile ../barcode.txt ../raw_fq/ATM_UN2_2.fastq.gz --gzipin --gzipout --idxread 1 --suffix .fastq
+
+
