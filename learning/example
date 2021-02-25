@@ -131,3 +131,14 @@ awk -F ' ' 'NF > 1{ a[$1] = a[$1]"\t"$2} END {for( i in a ) print i a[i]}' *.txt
 
 cat config | while read id ; do arr=(${id}); file=${arr[0]}; sample=${arr[1]}; cat ${file} | cut -f 1,6,8 > ${sample}.tsv ; done
 ls -l |grep "^d"|awk '{print $9}'  #디렉토리 이름만 추출 
+
+#gsea 후에 정리 
+ls -l |grep "^d"|awk '{print $9}' > con  #디렉토리 이름만 추출 
+cat con | while read id ; do cd ${id} ; ls gsea_report*.tsv > con2; ls gsea_report*.tsv | cut -d"_" -f5 > con; paste con2 con > config; 
+cat config | while read id ; do arr=(${id}); file=${arr[0]}; sample=${arr[1]}; cat ${file} | cut -f 1,6,8 > ${sample}.tsv ; done; 
+cat neg.tsv pos.tsv | grep -v "^NAME" > ../${id}_merge.tsv; cd ..; done
+echo -e "NAME\t2D\t2DP\t3D\t3DP\tPatient\tPatientP" > head.tsv
+awk 'NF > 1{ a[$1] = a[$1]"\t"$2"\t"$3} END {for( i in a ) print i a[i]}' *.tsv > merge.tsv
+cat head.tsv merge.tsv > merge2.tsv
+
+
