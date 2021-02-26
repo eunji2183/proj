@@ -98,9 +98,17 @@ three <- merge %>%
                 `3D_R1`,`3D_R2`,`3D_R3`,FC3D,log2FC3D)
 three <- data.frame(gene_name=rownames(three),three)
 rownames(three) <- NULL 
-
+three_coding_GSEA <- three%>%
+  dplyr::filter(FC3D != Inf) %>%
+  dplyr::filter(!is.nan(FC3D)) %>%
+  dplyr::select(gene_name,FC3D)
+              
 p <- merge %>%
   dplyr::select(Y5_NR,Y26_R,FCT,log2FCT)
 p<- data.frame(gene_name=rownames(p),p)
 rownames(p) <- NULL 
+p_coding_GSEA <- p %>%
+  dplyr::filter(FCT != Inf) %>%
+  dplyr::filter(!is.nan(FCT)) %>%
+  dplyr::select(gene_name,FCT)
 
