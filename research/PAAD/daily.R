@@ -112,3 +112,49 @@ p_coding_GSEA <- p %>%
   dplyr::filter(!is.nan(FCT)) %>%
   dplyr::select(gene_name,FCT)
 
+              
+### 2021/03/02 ###
+#protein-coding > PCA 
+setwd("/home/eunji/proj/2D3D/")
+count <- as.data.frame(fread("./HTseq.txt",fill = T,header = T))
+#GTF
+gtf <- rtracklayer::import("/proj2/ref/Homo_sapiens.GRCh38.102.gtf")
+gtf <- as.data.frame(gtf)
+ID <- gtf %>%
+  dplyr::select(gene_id,gene_name,gene_biotype) %>% distinct()
+save(ID,file="./ID.RData")
+
+coding_ID <- ID %>%
+  dplyr::filter(gene_biotype == "protein_coding") %>%
+  dplyr::select(gene_id,gene_name)
+
+save(coding_ID,file = "./protein_codingID.RData")
+
+coding_merge <- merge(coding_ID,count,by="gene_id")
+
+coding_merge <- coding_merge[!duplicated(coding_merge$gene_name),]
+coding_merge<- coding_merge[,-1]
+rownames(coding_merge) <- coding_merge[,1]
+coding_merge<- coding_merge[,-1]
+
+coding_merge <- coding_merge[,c(1:3,7:9,14,4:6,10:12,13)]
+names(coding_merge) <- rownames(Allcol)
+
+#PCA
+codingPCA <- as.matrix(sapply(coding_merge,as.numeric))
+codingPCA[is.na(codingPCA)] <- 0
+row.names(codingPCA) <- rownames(coding_merge)
+dds <- DESeqDataSetFromMatrix(countData = codingPCA,colData = Allcol,design = ~RESPONSE)
+dds <- DESeq(dds)
+vsd <- vst(dds, blind=TRUE)
+vsd <- vst(dds)
+pcaData <- plotPCA(vsd,intgroup="RESPONSE",returnData=TRUE)
+percentVar <- round(100*attr(pcaData,"percentVar"))
+ggplot(pcaData,aes(PC1,PC2,color=group,shape=group)) +
+  geom_point(size=3) +
+  xlab(paste0("PC1: ",percentVar[1],"% variance")) +
+  ylab(paste0("PC2: ",percentVar[2],"% variance")) +
+  coord_fixed()+
+  geom_label_repel(aes(label=name), 
+                   fontface="bold", color="grey50", box.padding=unit(0.35, "lines"), 
+                   point.padding=unit(0.2, "lines"), segment.colour = "grey50",size=02)
