@@ -141,4 +141,6 @@ echo -e "NAME\t2D\t2DP\t3D\t3DP\tPatient\tPatientP" > head.tsv
 awk 'NF > 1{ a[$1] = a[$1]"\t"$2"\t"$3} END {for( i in a ) print i a[i]}' *.tsv > merge.tsv
 cat head.tsv merge.tsv > merge2.tsv
 
+cat HALLMARK.txt | awk '$2 == "Green" {print $0, "\tImmune"} > immune.txt 
+sed 's/"//g' HALLMARK.txt > HALLMARK2.txt  #""없애기 
 
