@@ -158,3 +158,66 @@ ggplot(pcaData,aes(PC1,PC2,color=group,shape=group)) +
   geom_label_repel(aes(label=name), 
                    fontface="bold", color="grey50", box.padding=unit(0.35, "lines"), 
                    point.padding=unit(0.2, "lines"), segment.colour = "grey50",size=02)
+
+### 2021/03/04 ###
+#PCA sample 분리하는데 공헌많이한 gene 
+
+setwd("/home/eunji/proj/2D3D/")
+count <- as.data.frame(fread("./HTseq.txt",fill = T,header = T))
+#GTF
+gtf <- rtracklayer::import("/proj2/ref/ensembl102/Homo_sapiens.GRCh38.102.gtf")
+gtf <- as.data.frame(gtf)
+ID <- gtf %>%
+  dplyr::select(gene_id,gene_name,gene_biotype) %>% distinct()
+save(ID,file="./ID.RData")
+
+count <- merge(ID,count,by="gene_id")
+count <- count[,-c(1,3)]
+count <- count[!duplicated(count$gene_name),]
+rownames(count) <- count[,1]
+count <- count[,-1]
+
+install.packages("useful")
+library(useful)
+kable(corner(count,r=15,c=8), booktabs=T, caption="Gene expression matrix")
+count <- count[,c(1:3,7:9,14,4:6,10:12,13)]
+names(count) <- rownames(Allcol)
+count2 <- as.matrix(sapply(count,as.numeric))
+count2[is.na(count2)] <- 0
+row.names(count2) <- rownames(count)
+dds <- DESeqDataSetFromMatrix(countData = count2,colData = Allcol,design = ~RESPONSE)
+dds <- DESeq(dds)
+deseqnorm <- as.data.frame(counts(dds,normalized=TRUE))
+
+save(deseqnorm,file = "./DESeq_normcount.RData")
+
+#TPM normalization 
+count <- as.data.frame(fread("./HTseq.txt",fill = T,header = T))
+geneLength <- as.data.frame(fread("./hg38_gene_length.txt",fill = T,header = F))
+names(geneLength)[1] <- 'gene_id'
+names(geneLength)[2] <- 'gene_length'
+
+rownames(count) <- count[,1]
+count <- count[,-1]
+geneLength <- geneLength[order(geneLength$gene_id),]
+rownames(geneLength) <- NULL
+
+tpm <- function(counts,lengths){
+  rpk <- counts/(lengths/1000)
+  coef <- sum(rpk)/1e6
+  rpk/coef
+} 
+
+tpms <- apply(count,2,function(x)tpm(x,geneLength$gene_length))
+tpms <- as.data.frame(tpms)
+tpms <- data.frame(gene_id=rownames(tpms),tpms)
+rownames(tpms) <- NULL
+merge <- merge(ID,tpms,by="gene_id")
+merge <- merge[!duplicated(merge$gene_name),]
+merge <- merge[,-c(1,3)]
+rownames(merge) <- merge[,1]
+merge <- merge[,-1]
+merge <- merge[,c(1:3,7:9,14,4:6,10:12,13)]
+names(merge) <- rownames(Allcol)
+
+save(merge,file = "./TPM_normcount.RData")
