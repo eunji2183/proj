@@ -158,7 +158,70 @@ ggplot(pcaData,aes(PC1,PC2,color=group,shape=group)) +
   geom_label_repel(aes(label=name), 
                    fontface="bold", color="grey50", box.padding=unit(0.35, "lines"), 
                    point.padding=unit(0.2, "lines"), segment.colour = "grey50",size=02)
+#GSEA result pheatmap 
+fcmerge <- read.table("/home/eunji/gsea_home/output/feb24/keggcoding/merge2.tsv",
+                      sep = "\t",header = T,row.names = 1,fill = T)
 
+names(fcmerge) <- c('2D','2D_p','3D','3D_p','Patient','Patient_p')
+p <- fcmerge %>%
+  dplyr::select(`2D`,`3D`,Patient)
+
+p1 <- p %>%
+  dplyr::filter(`3D` < 0 & Patient < 0) %>%
+  dplyr::filter(`2D` > 0)
+p2 <- p %>%
+  dplyr::filter(`3D` > 0 & Patient > 0) %>%
+  dplyr::filter(`2D` < 0)  
+
+p <- rbind(p1,p2)
+
+paletteLength <- 30
+myColor <- colorRampPalette(c('navy','white','red'))(paletteLength)
+# length(breaks) == length(paletteLength) + 1
+# use floor and ceiling to deal with even/odd length pallettelengths
+myBreaks <- c(seq(min(p), 0, length.out=ceiling(paletteLength/2) + 1), 
+              seq(max(p)/paletteLength, max(p), length.out=floor(paletteLength/2)))
+
+pheatmap(p, cluster_cols = T,cluster_rows = T,
+         clustering_distance_row = "correlation",
+         fontsize_col=12,fontsize_row=11, cellwidth = 30, cellheight = 15,
+         color=myColor, breaks=myBreaks)
+
+fcmerge_kegg <- read.table("/home/eunji/gsea_home/output/feb24/hallmark_coding_all/merge2.tsv",
+                           sep = "\t",header = T,row.names = 1,fill = T)
+
+names(fcmerge_kegg) <- c('2D','2D_p','3D','3D_p','Patient','Patient_p')
+k <- fcmerge_kegg %>%
+  dplyr::select(`2D`,`3D`,Patient)
+
+k1 <- k %>%
+  dplyr::filter(`3D` < 0 & Patient < 0) %>%
+  dplyr::filter(`2D` > 0)
+k2 <- k %>%
+  dplyr::filter(`3D` > 0 & Patient > 0) %>%
+  dplyr::filter(`2D` < 0)  
+
+k <- rbind(k1,k2)
+
+all <- rbind(p,k)
+
+all <- all %>%
+  dplyr::filter(`2D` != "---")
+
+all[,1] <- as.numeric(all[,1])
+all[,2] <- as.numeric(all[,2])
+paletteLength <- 30
+myColor <- colorRampPalette(c('navy','white','red'))(paletteLength)
+# length(breaks) == length(paletteLength) + 1
+# use floor and ceiling to deal with even/odd length pallettelengths
+myBreaks <- c(seq(min(all), 0, length.out=ceiling(paletteLength/2) + 1), 
+              seq(max(all)/paletteLength, max(all), length.out=floor(paletteLength/2)))
+
+pheatmap(all, cluster_cols = T,cluster_rows = T,
+         clustering_distance_row = "correlation",
+         fontsize_col=12,fontsize_row=8, cellwidth = 20, cellheight = 8,
+         color=myColor, breaks=myBreaks)
+       
 ### 2021/03/04 ###
 #PCA sample 분리하는데 공헌많이한 gene 
 
