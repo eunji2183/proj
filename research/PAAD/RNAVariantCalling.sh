@@ -1,0 +1,138 @@
+# RNA seq Variant calling 
+
+#STAR 2-pass 
+cat config | while read id 
+do
+STAR \
+--runThreadN 6 \
+--genomeDir ../ref/STAR_index_GRCh38_gencode_v33 \
+--twopassMode Basic \
+--readFilesIn ../clean_fq/${id}_R1_val_1.fq.gz ../clean_fq/${id}_R2_val_2.fq.gz \
+--readFilesCommand zcat \
+--sjdbOverhang 150 \
+--outSAMtype BAM Unsorted \
+--chimOutType SeparateSAMold \
+--quantMode GeneCounts \
+--outFileNamePrefix ./2-pass_GRCh38_gencode_v33/${id}
+ done
+
+
+#picard AddOrReplaceReadGroups
+cat config | while read id 
+do
+picard AddOrReplaceReadGroups \
+I=./STAR/2-pass_GRCh38_gencode_v33/${id}Aligned.out.bam \
+O=./STAR/2-pass_GRCh38_gencode_v33/${id}_sorted.bam \
+SO=coordinate RGID=${id} RGLB=mRNA RGPL=illumina RGPU=HiSeq2500 RGSM=${id}
+done
+
+#picard MarkDuplicates
+cat config | while read id 
+do
+picard MarkDuplicates \
+I=./STAR/2-pass_GRCh38_gencode_v33/${id}_sorted.bam \
+O=./STAR/2-pass_GRCh38_gencode_v33/${id}_sorted_maked.bam \
+CREATE_INDEX=true \
+VALIDATION_STRINGENCY=SILENT \
+METRICS_FILE=./STAR/2-pass_GRCh38_gencode_v33/${id}.metrics
+done
+
+picard CreateSequenceDictionary \
+R=/home/eunji/proj/PAAD/data/RNA/ref/GRCh38_gencode_v33_CTAT_lib_Apr062020.plug-n-play/ctat_genome_lib_build_dir/ref_genome.fa \
+O=/home/eunji/proj/PAAD/data/RNA/ref/GRCh38_gencode_v33_CTAT_lib_Apr062020.plug-n-play/ctat_genome_lib_build_dir/ref_genome.dict
+
+# !!! conda install samtools==1.11
+samtools faidx /home/eunji/proj/PAAD/data/RNA/ref/GRCh38_gencode_v33_CTAT_lib_Apr062020.plug-n-play/ctat_genome_lib_build_dir/ref_genome.fa
+
+#gatk SplitNCigarReads AddOrReplaceReadGroups
+cat config | while read id
+do
+gatk SplitNCigarReads \
+-R ./ref/GRCh38_gencode_v33_CTAT_lib_Apr062020.plug-n-play/ctat_genome_lib_build_dir/ref_genome.fa \
+-I ./STAR/2-pass_GRCh38_gencode_v33/${id}_sorted_maked.bam \
+-O ./STAR/2-pass_GRCh38_gencode_v33/${id}_sorted_maked_split.bam
+done
+
+cat config | while read id 
+do
+gatk AddOrReplaceReadGroups \
+-I ./STAR/2-pass_GRCh38_gencode_v33/${id}_sorted_maked_split.bam \
+-O ./STAR/2-pass_GRCh38_gencode_v33/${id}_split_add.bam \
+-LB ${id} -PL ILLUMINA -PU ${id} -SM ${id}
+done
+
+
+#gatk BaseRecalibrator ApplyBQSR
+GENOME=/home/eunji/proj/PAAD/data/RNA/ref/GRCh38_gencode_v33_CTAT_lib_Apr062020.plug-n-play/ctat_genome_lib_build_dir/ref_genome.fa
+DBSNP=/home/eunji/proj/PAAD/data/RNA/ref/hg38/dbsnp_146.hg38.vcf.gz
+kgSNP=/home/eunji/proj/PAAD/data/RNA/ref/hg38/1000G_phase1.snps.high_confidence.hg38.vcf.gz
+kgINDEL=/home/eunji/proj/PAAD/data/RNA/ref/hg38/Mills_and_1000G_gold_standard.indels.hg38.vcf.gz
+cat config | while read id
+do
+gatk --java-options "-Xmx20G -Djava.io.tmpdir=./tmp" BaseRecalibrator \
+ -I ./STAR/2-pass_GRCh38_gencode_v33/${id}_sorted_maked_split.bam \
+ -R $GENOME \
+ -O ./STAR/2-pass_GRCh38_gencode_v33/${id}_recal.table --known-sites $kgSNP --known-sites $kgINDEL
+
+ gatk --java-options "-Xmx20G -Djava.io.tmpdir=./tmp" ApplyBQSR \
+ -I ./STAR/2-pass_GRCh38_gencode_v33/${id}_sorted_maked_split.bam \
+ -R $GENOME \
+ --output ./STAR/2-pass_GRCh38_gencode_v33/${id}_recal.bam \
+ -bqsr ./STAR/2-pass_GRCh38_gencode_v33/${id}_recal.table
+ done
+
+GENOME=/home/eunji/proj/PAAD/data/RNA/ref/GRCh38_gencode_v33_CTAT_lib_Apr062020.plug-n-play/ctat_genome_lib_build_dir/ref_genome.fa
+DBSNP=/home/eunji/proj/PAAD/data/RNA/ref/hg38/dbsnp_146.hg38.vcf.gz
+cat config | while read id
+do
+gatk --java-options "-Xmx20G -Djava.io.tmpdir=./tmp" HaplotypeCaller \
+-R $GENOME \
+-I ./STAR/2-pass_GRCh38_gencode_v33/${id}_recal.bam \
+-O ./STAR/2-pass_GRCh38_gencode_v33/${id}.vcf \
+--dbsnp $DBSNP \
+--dont-use-soft-clipped-bases \
+-stand-call-conf 20.0
+done
+
+cat config | while read id 
+do
+gatk --java-options "-Xmx20G -Djava.io.tmpdir=./tmp" VariantFiltration \
+-R $GENOME \
+-V ./STAR/2-pass_GRCh38_gencode_v33/${id}.vcf \
+-window 35 \
+-cluster 3 \
+--filter-name FS -filter "FS > 30.0" \
+--filter-name QD -filter "QD < 2.0" \
+-O ./STAR/2-pass_GRCh38_gencode_v33/${id}_filtered.vcf
+done
+
+#annovar annotation 
+#download reference - hg38 version, clinvar_20200316, genomad_genome 등
+./annotate_variation.pl -downdb -buildver hg38 -webfrom annovar clinvar_20200316 humandb/  
+./annotate_variation.pl -downdb -buildver hg38 -webfrom annovar gnomad_genome humandb/
+
+#annovar annotation 
+
+cat config | while  read id
+do
+echo "start ANNOVAR for ${id} " `date`
+~/tool/annovar/table_annovar.pl ./STAR/2-pass_GRCh38_gencode_v33/${id}_filtered.vcf ~/tool/annovar/humandb/ \
+-buildver hg38 \
+-out ./STAR/annovar/${id} \
+-remove \
+-protocol refGene,avsnp147,clinvar_20200316,cosmic70 \
+-operation g,f,f,f \
+-nastring . \
+-vcfinput
+echo "end ANNOVAR for ${id} " `date`
+done
+
+
+cat config | while read id
+do
+        grep -v '^Chr' ${id}.hg38_multianno.txt | cut -f 1-17 | awk -v S=${id} '{print $0"\t"S}' > ${id}.annovar.vcf
+done
+head -1 ./STAR/annovar/${id}.hg38_multianno.txt| sed 's/Otherinfo/Tumor_Sample_Barcode\tMatched_Norm_Sample_Barcode/' >./STAR/annovar/header
+
+cat ./STAR/annovar/header ./STAR/annovar/*annovar.vcf >./STAR/annovar/annovar_merge.vcf
+cat annovar_merge.vcf | awk '/3D_NR/' | awk '$6~/^exonic/'  > 3D_NR.vcf
