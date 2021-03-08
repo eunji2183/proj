@@ -1,4 +1,5 @@
 cat Homo_sapiens.GRCh38.96.gtf | awk -F'\t' '{if($3=="gene") {split($9,a,";"); print a[1]"\t"$5-$4};}' | sed 's/[gene_id |"|]//g' > hg38_gene_length.txt 
+cat genv37_gene_length.txt | awk -F'\t' '{{split($1,a,"."); print a[1]"\t"$2"\t"$3};}' > genv37.txt #ENSG0000000.1 뒤에 .1삭제 
 
 #file 일괄처리 SRR file 에서 SRR... 떼고 sample 명으로만 파일이름을 교체 
 ls | grep "SRR" | cut -d"_" -f 3-4,8 > sample   
