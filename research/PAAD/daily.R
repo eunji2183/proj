@@ -284,3 +284,57 @@ merge <- merge[,c(1:3,7:9,14,4:6,10:12,13)]
 names(merge) <- rownames(Allcol)
 
 save(merge,file = "./TPM_normcount.RData")
+
+### 2021/03/09 ###               
+setwd("/home/eunji/proj/2D3D/")
+
+#TCGA PAAD_clinical , GDAC-mRNAseq raw-count 
+PAAD<- as.data.frame(fread("./HYPOXIA/PAAD.clin.merged.txt",fill = T,header = F,stringsAsFactors = F))
+PAAD <- as.data.frame(t(PAAD))
+colnames(PAAD) <- PAAD[1,]
+PAAD <- PAAD[-1,]
+PAAD <- PAAD[,c(11:14,18,22,25,216:219,228,229,299,300,321,323,324,326,328:330,341,366,391,393,417,425:427,437)]
+
+save(PAAD,file = "./HYPOXIA/clinical.RData")
+
+PAAD <- PAAD %>%
+  dplyr::filter(patient.drugs.drug.drug_name == "gemcitabine")
+
+PAAD$patient.drugs.drug.measure_of_response <- ifelse(is.na(PAAD$patient.drugs.drug.measure_of_response),0,PAAD$patient.drugs.drug.measure_of_response) 
+PAAD <- PAAD %>%
+  dplyr::filter(patient.drugs.drug.measure_of_response != 0)
+PAAD <- PAAD %>%
+  dplyr::filter(patient.drugs.drug.measure_of_response == "clinical progressive disease" | patient.drugs.drug.measure_of_response == "complete response")
+PAAD$response <- ifelse(PAAD$patient.drugs.drug.measure_of_response == "clinical progressive disease",'NO','YES')
+response <- PAAD[,c(5,32)]
+response <- data.frame(toupper(response$patient.bcr_patient_barcode),response$response)
+names(response) <- c('SAMPLE','RESPONSE')
+
+rownames(response) <- response[,1]
+response <- data.frame(row.names = response$SAMPLE,RESPONSE=response$RESPONSE)
+
+#response & hypoxia score 관계 
+names(hypoxia)[1] <- 'SAMPLE'
+reshy <- merge(response,hypoxia,by="SAMPLE")
+names(reshy)[4] <- 'Winter_Hypoxia_score'
+names(reshy)[5] <- 'Ragnum_hypoxia_score'
+names(reshy)[6] <- "West_hypoxia_score"
+  
+  
+  
+install.packages("ggpubr")
+install.packages("devtools")
+library(ggpubr)
+library(devtools)
+p <- ggboxplot(reshy, x = "RESPONSE", y = "West_hypoxia_score",
+               color = "RESPONSE", palette = "jco",
+               bxp.errorbar = T,bxp.errorbar.width = 0.2,
+               add = "jitter")+
+  labs(title = 'HYPOXIA',
+       caption = 'Data source: TCGA-PAAD',
+       x='RESPONSE') 
+#  Add p-value
+p + stat_compare_means()
+# Change method
+p + stat_compare_means(method = "t.test",label.x = 0.7,label.y = 23)              
+              
