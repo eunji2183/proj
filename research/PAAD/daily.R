@@ -285,14 +285,24 @@ names(merge) <- rownames(Allcol)
 
 save(merge,file = "./TPM_normcount.RData")
 
-### 2021/03/09 ###               
-setwd("/home/eunji/proj/2D3D/")
+### 2021/03/09 ###                        
+              
+setwd("/home/eunji/miniconda3/tmp/2D3D")
+library(data.table)
+library(stringr)
+library(ggpubr)
+library(devtools)
+library(DESeq2)
+library(tibble)
+library(GSVA)
+library(limma)
+
 
 #TCGA PAAD_clinical , GDAC-mRNAseq raw-count 
 PAAD<- as.data.frame(fread("./HYPOXIA/PAAD.clin.merged.txt",fill = T,header = F,stringsAsFactors = F))
+rownames(PAAD) <- PAAD[,1]
+PAAD <- PAAD[,-1]
 PAAD <- as.data.frame(t(PAAD))
-colnames(PAAD) <- PAAD[1,]
-PAAD <- PAAD[-1,]
 PAAD <- PAAD[,c(11:14,18,22,25,216:219,228,229,299,300,321,323,324,326,328:330,341,366,391,393,417,425:427,437)]
 
 save(PAAD,file = "./HYPOXIA/clinical.RData")
@@ -300,9 +310,8 @@ save(PAAD,file = "./HYPOXIA/clinical.RData")
 PAAD <- PAAD %>%
   dplyr::filter(patient.drugs.drug.drug_name == "gemcitabine")
 
-PAAD$patient.drugs.drug.measure_of_response <- ifelse(is.na(PAAD$patient.drugs.drug.measure_of_response),0,PAAD$patient.drugs.drug.measure_of_response) 
 PAAD <- PAAD %>%
-  dplyr::filter(patient.drugs.drug.measure_of_response != 0)
+  dplyr::filter(patient.drugs.drug.measure_of_response != "NA")
 PAAD <- PAAD %>%
   dplyr::filter(patient.drugs.drug.measure_of_response == "clinical progressive disease" | patient.drugs.drug.measure_of_response == "complete response")
 PAAD$response <- ifelse(PAAD$patient.drugs.drug.measure_of_response == "clinical progressive disease",'NO','YES')
@@ -313,19 +322,24 @@ names(response) <- c('SAMPLE','RESPONSE')
 rownames(response) <- response[,1]
 response <- data.frame(row.names = response$SAMPLE,RESPONSE=response$RESPONSE)
 
+
+
 #response & hypoxia score 관계 
+#TCGA hypoxia score 
+
+hypoxia <- as.data.frame(fread("./HYPOXIA/TCGA_HYPOXIA_SCORE.txt",fill = T,header = T))
+hypoxia <- hypoxia %>%
+  dplyr::filter(tumour_type == "PAAD")
+hypoxia$patient_id <- gsub('.','-',hypoxia$patient_id,fixed = T)
 names(hypoxia)[1] <- 'SAMPLE'
+
+
 reshy <- merge(response,hypoxia,by="SAMPLE")
 names(reshy)[4] <- 'Winter_Hypoxia_score'
 names(reshy)[5] <- 'Ragnum_hypoxia_score'
 names(reshy)[6] <- "West_hypoxia_score"
   
   
-  
-install.packages("ggpubr")
-install.packages("devtools")
-library(ggpubr)
-library(devtools)
 p <- ggboxplot(reshy, x = "RESPONSE", y = "West_hypoxia_score",
                color = "RESPONSE", palette = "jco",
                bxp.errorbar = T,bxp.errorbar.width = 0.2,
@@ -336,5 +350,296 @@ p <- ggboxplot(reshy, x = "RESPONSE", y = "West_hypoxia_score",
 #  Add p-value
 p + stat_compare_means()
 # Change method
-p + stat_compare_means(method = "t.test",label.x = 0.7,label.y = 23)              
-              
+p + stat_compare_means(method = "t.test",label.x = 0.7,label.y = 23)
+
+
+#hypoxia 와 glutaminolysis 관계
+
+count <- as.data.frame(fread("./HYPOXIA/count.txt",fill = T,header = T))
+count <- count[!duplicated(count$`HYBRIDIZATION R`),]
+rownames(count) <- count[,1]
+count <- count[,-1]
+count <- round(count)
+tcount <- as.data.frame(t(count))
+tcount$group <- as.numeric(as.character(substring(rownames(tcount),14,15)))
+tcount$group <- ifelse(tcount$group < 5 , 'T','N')
+tcount <- tcount %>%
+  dplyr::filter(group == "T")
+tcount <- tcount[,c(1:(length(colnames(tcount)) -1))]
+rownames(tcount) <- str_sub(rownames(tcount),1,12)
+count <- as.data.frame(t(tcount))
+count <- count[-1,]
+tcount <- as.data.frame(t(count))
+tcount <- data.frame(SAMPLE=rownames(tcount),tcount)
+rownames(tcount) <- NULL
+
+
+tcount <- merge(hypoxia,tcount,by="SAMPLE")
+
+hycol <- tcount[,1:11]
+rownames(hycol)  <- hycol[,1]
+hycol <- hycol[,-1]
+
+
+tcount <- tcount[,-c(2:11)]
+rownames(tcount) <- tcount[,1]
+tcount <- tcount[,-1]
+count <- as.data.frame(t(tcount))
+
+
+
+rownames(tcount) <- tcount[,1]
+tcount <- tcount[,-1]
+tcount <- tcount[order(tcount$RESPONSE,decreasing = T),]
+
+count <- as.data.frame(t(tcount))
+count <- count[-1,]
+
+glucol <- data.frame(row.names = rownames(tcount),RESPONSE=tcount[,1])
+glucol <- glucol[order(glucol$RESPONSE,decreasing = T),]
+glucol <- data.frame(row.names = colnames(count),RESPONSE=glucol)
+glucol$RESPONSE <- as.factor(glucol$RESPONSE)
+
+count2 <- as.matrix(sapply(count,as.numeric))
+count2[is.na(count2)] <- 0
+row.names(count2) <- rownames(count)
+dds <- DESeqDataSetFromMatrix(countData = count2,colData = hycol,design = ~Ragnum_hypoxia_score_pan_cancer)
+dds <- DESeq(dds)
+normglu <- as.data.frame(counts(dds,normalized=TRUE))
+
+glu <- read.table(file = "./2D3D/geneset/glutaminolysis.txt",sep = "\t",header = F)
+glu <- glu$V1
+glucount <- subset(normglu, (rownames(normglu) %in% glu))
+
+
+p <- glucount
+
+p <- apply(p,1,function(x){(x-mean(x))/sd(x)}) 
+
+p <- merge(annocol,p,by="row.names")
+
+p <- p %>% dplyr::filter(Row.names != "TCGA-2J-AABI")
+p <- p %>% dplyr::filter(Row.names != "TCGA-2J-AABV")
+p <- p %>% dplyr::filter(Row.names != "TCGA-FB-AAQ1")
+p <- p %>% dplyr::filter(Row.names != "TCGA-IB-7654")
+p <- p %>% dplyr::filter(Row.names != "TCGA-US-A779")
+p <- p %>% dplyr::filter(Row.names != "TCGA-F2-6880")
+p <- p %>% dplyr::filter(Row.names != "TCGA-HZ-7918")
+
+s1 <- ggscatter(p, x = "hypoxia_score", y ="PPAT", 
+                add = "reg.line", conf.int = TRUE, 
+                cor.coef = TRUE, cor.method = "pearson",
+                xlab = "hypoxia_score", ylab = "PPAT")
+s2 <- ggscatter(p, x = "hypoxia_score", y ="GMPS", 
+                add = "reg.line", conf.int = TRUE, 
+                cor.coef = TRUE, cor.method = "pearson",
+                xlab = "hypoxia_score", ylab = "GMPS")
+
+s3 <- ggscatter(p, x = "hypoxia_score", y = "SLC1A5", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          xlab = "hypoxia_score", ylab = "SLC1A5")
+
+par(mfrow=c(2,2))
+
+grid.arrange(s1, s2, ncol=2)
+
+ggscatter(p, x = "hypoxia_score", y = "SLC7A2", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          xlab = "hypoxia_score", ylab = "SLC7A2")
+
+
+cor.test(tnorm$HDAC8, tnorm$HDAC6, 
+         method = "pearson")
+
+
+uns <- c("ASNS","CTPS2","GFPT2","GLS2","GLS","GLUL","GOT1","GPT2","GPT","MDH1","PFAS","PHGDH","SLC16A10","SLC6A15","SLC7A2")
+
+p <- p %>% 
+  dplyr::select(!(uns))
+
+p <- p %>%
+  dplyr::filter(hypoxia_score > 6 | hypoxia_score < -16)
+
+annocol <- data.frame(SAMPLE = rownames(hycol),hypoxia_score=hycol$Ragnum_hypoxia_score_pan_cancer)
+annocol <- annocol[order(annocol$hypoxia_score,decreasing = T),]
+annocol <- data.frame(row.names = annocol$SAMPLE,hypoxia_score=annocol$hypoxia_score)
+
+
+
+
+p <- data.frame(SAMPLE=rownames(p),as.data.frame(p))
+rownames(p) <- NULL
+p <- merge(annocol,p,by="SAMPLE")
+p <- p[order(p$hypoxia_score,decreasing = T),]
+
+
+annocol <- data.frame(row.names = p$Row.names,hypoxia_score=p$hypoxia_score)
+
+p <- p[,-2]
+rownames(p) <- p[,1]
+p <- p[,-1]
+p <- t(p)
+
+
+p[p>5]=5
+p[p<-5]=-5
+
+paletteLength <- 5
+myColor <- colorRampPalette(c('blue','white','firebrick'))(paletteLength)
+
+myBreaks <- c(seq(min(p),0, length.out=ceiling(paletteLength/2) + 1), 
+              seq(max(p)/paletteLength, max(p), length.out=floor(paletteLength/2)))
+
+ann_colors = list( hypoxia_score = c("white", "#D95F02"))
+
+library(ComplexHeatmap)
+ha = HeatmapAnnotation(hypoxia_score = anno_barplot(annocol$hypoxia_score, baseline = 0,
+                                                    bar_width = 1,
+                                                    gp = gpar(col = "white", fill = "black"), border = F,
+                                                    height = unit(3, "cm")))
+
+
+pheatmap(p, cluster_cols =F ,cluster_rows = T,
+         clustering_distance_row = "correlation",
+         fontsize_col=8,fontsize_row=8, cellwidth = 8,cellheight = 11,
+         color=myColor,legend = T,breaks = myBreaks,top_annotation=ha,
+         show_colnames = F,scale = F)
+
+
+#response & hypoxia - glutaminolysis gene 
+#coldata : response , norm: RESPONSE , glu, hypo, 
+
+hypo <- read.table(file = "./2D3D/geneset/hypoxia.txt",header = F)
+hypo <- data.frame(gene_name=hypo$V1,GeneGroup="Hypoxia")
+glu <- read.table(file = "./2D3D/geneset/glutaminolysis.txt",sep = "\t",header = F)
+glu <- data.frame(gene_name=glu$V1,GeneGroup="Glutaminolysis")
+hypoglu <- rbind(hypo,glu)
+hypoglu <- data.frame(row.names = hypoglu$gene_name,GeneGroup=hypoglu$GeneGroup)
+
+hgcount <- merge(response,tcount,by="SAMPLE")
+
+rownames(hgcount) <- hgcount[,1]
+hgcount <- hgcount[,-1]
+hgcount <- hgcount[order(hgcount$RESPONSE,decreasing = T),]
+
+hgcol <- data.frame(row.names = rownames(hgcount),RESPONSE=hgcount[,1])
+hgcol$RESPONSE <- as.factor(hgcol$RESPONSE)
+
+hgcount <- as.data.frame(t(hgcount))
+hgcount <- hgcount[-1,]
+
+hgcount2 <- as.matrix(sapply(hgcount,as.numeric))
+hgcount2[is.na(hgcount2)] <- 0
+row.names(hgcount2) <- rownames(hgcount)
+dds <- DESeqDataSetFromMatrix(countData = hgcount2,colData = hgcol,design = ~RESPONSE)
+dds <- DESeq(dds)
+resultsNames(dds)
+resLFC <- lfcShrink(dds, coef="RESPONSE_YES_vs_NO", type="apeglm")
+res <- as.data.frame(resLFC)
+res <- res %>% dplyr::filter(!is.na(log2FoldChange))
+resdata <- merge(as.data.frame(res),as.data.frame(counts(dds,normalized=TRUE)),
+                 by="row.names",sort=FALSE)
+resdata <- resdata[order(resdata$log2FoldChange,decreasing = T),]
+
+
+#GSEA rnk file 
+hgGSEA <- resdata %>%
+  dplyr::select(Row.names,log2FoldChange)
+write.table(hgGSEA,file = "./hgGSEA.rnk",sep = "\t",row.names = F,col.names = F,quote = F)
+
+
+
+normhg <- as.data.frame(counts(dds,normalized=TRUE))
+
+hg <- rownames(hypoglu)
+hgcount <- subset(normhg, (rownames(normhg) %in% hg))
+
+h <- hgcount
+
+h <- apply(h,1,function(x){(x-mean(x))/sd(x)}) 
+h <- as.data.frame(t(h))
+
+paletteLength <- 30
+myColor <- colorRampPalette(c('blue','white','firebrick'))(paletteLength)
+
+myBreaks <- c(seq(min(h),0, length.out=ceiling(paletteLength/2) + 1), 
+              seq(max(h)/paletteLength, max(h), length.out=floor(paletteLength/2)))
+library(pheatmap)
+pheatmap(h, cluster_cols =T ,cluster_rows = T,
+         clustering_distance_row = "correlation",
+         fontsize_col=8,fontsize_row=8, cellwidth = 8,cellheight = 11,
+         color=myColor,legend = T,breaks = myBreaks,
+         annotation_row = hypoglu,annotation_col = hgcol,
+         show_colnames = F)
+
+
+
+#ssGSEA 
+geneSet <- read.csv2("./2D3D/geneset/hypoglu.gmt",header = F,sep = "\t")
+geneSet <- geneSet[,-2]
+geneSet <- geneSet %>%
+  column_to_rownames("V1")%>%t()
+a <- geneSet
+a <- a[1:nrow(a),]
+set <- colnames(a)
+l <- list()
+#i <- "Activated CD8 T cell"
+for (i in set) {
+  x <-  as.character(a[,i])
+  x <- x[nchar(x)!=0]
+  x <-  as.character(x)
+  l[[i]] <-x
+}
+save(l,file = "./gene_set.Rdata")
+
+
+dat <- as.matrix(normhg)
+ssgsea<- gsva(dat, l,method='ssgsea',kcdf='Gaussian',abs.ranking=TRUE)
+ss <- as.data.frame(ssgsea)
+
+ss <- apply(ss,1,function(x){(x-mean(x))/sd(x)})
+ss <- ss[,-1]
+ss <- ss[-c(38,36),]
+ss <- ss[-c(2,6,14,17),]
+ss <- ss[-c(14:17),]
+ss <- ss[-c(19,21),]
+ss <- ss[-14,]
+ss <- ss[-23,]
+ss <- ss[c(4,1,7,2,3,6,8,10,12,9,11,13,5,26,21,23,25,26,14,16,18,20,15,27,17,19,22,24,28),]
+
+
+
+paletteLength <- 100
+myColor <- colorRampPalette(c('black','white','yellow'))(paletteLength)
+
+myBreaks <- c(seq(min(ss),0, length.out=ceiling(paletteLength/2) + 1), 
+              seq(max(ss)/paletteLength, max(ss), length.out=floor(paletteLength/2)))
+
+
+ann_colors = list(
+  RESPONSE = c(NO = "black", YES = "firebrick3")
+)
+
+
+pheatmap(ss, cluster_cols =T ,cluster_rows = F,
+         clustering_distance_row = "correlation",
+         fontsize_col=8,fontsize_row=8, cellwidth = 20,cellheight = 10,
+         color=myColor,legend = T,breaks = myBreaks,annotation_row = hgcol,
+         show_colnames = T,annotation_colors = ann_colors)
+
+
+#scatterplot 
+
+sp <- data.frame(row.names=rownames(ss),ss)
+sp <- merge(sp,hgcol,by="row.names")
+
+
+ggplot(sp,aes(HYPOXIA,GLUTAMINOLYSIS ,color=RESPONSE)) + 
+  geom_point(size=5) + 
+  scale_color_manual(values = c('#999999','#E69F00')) + 
+  theme(legend.position=c(0,1), legend.justification=c(0,1)) +
+  stat_ellipse(type = "euclid")+
+  labs(title="ssGSEA-TCGA",
+       x="Hypoxia(NES)", y = "Glutaminolysis(NES)")
