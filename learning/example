@@ -148,3 +148,4 @@ sed 's/"//g' HALLMARK.txt > HALLMARK2.txt  #""없애기
 cat Homo_sapiens.GRCh38.102.gtf | awk -F'\t' '{if($3=="gene") {split($9,a,";"); print a[1]"\t"a[3]"\t"$5-$4};}' | sed 's/[gene_id |"|]//g' | sed 's/[gene_name |"|]//g' > en102_gene_length.txt
 ../tool/fastq-multx/fastq-multx -B barcode.txt -m 0 ./raw_fq/ATM_IR1_2.fastq.gz -o n/a
 
+awk 'BEGIN {OFS=FS="\t"; } $7 !~ /HLA-A|HLA-B|HLA-C|HLA-D|HLA-E|HLA-F|HLA-G/' all_exonic.vcf > HLAout.vcf
