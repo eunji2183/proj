@@ -5,3 +5,4 @@ https://physiology.med.cornell.edu/faculty/skrabanek/lab/angsd/lecture_notes/STA
 #Next generation sequencing of esophageal squamous cell carcinoma (ESCC) cell line KYSE-180 single cell transcriptomes for radio-resistance analysis
 https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE81812 #scRNA 
 https://www.ncbi.nlm.nih.gov/Traces/study/?acc=SRP110339&o=acc_s%3Aa #bulk RNA
+https://www.bioconductor.org/packages/release/workflows/vignettes/TCGAWorkflow/inst/doc/TCGAWorkflow.html
