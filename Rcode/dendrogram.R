@@ -1,3 +1,6 @@
+#https://jcoliver.github.io/learn-r/008-ggplot-dendrograms-and-heatmaps.html
+#https://www.r-graph-gallery.com/dendrogram.html#:~:text=A%20dendrogram%20(or%20tree%20diagram,to%20build%20one%20with%20R.
+
 #dendrogram 
 data <- matrix( sample(seq(1,2000),200), ncol = 10 )
 rownames(data) <- paste0("sample_" , seq(1,20))
