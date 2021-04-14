@@ -4,3 +4,9 @@ sudo gedit /etc/apt/sources.list
 deb http://security.ubuntu.com/ubuntu xenial-security main
 sudo apt update
 sudo apt install libssl1.0.0
+
+
+#lab server rstudio 들어가지지 않을때 
+cd /home/eunji/.local/share/rstudio/sessions/active
+rm -r session....
+지우고 들어가면 됨
