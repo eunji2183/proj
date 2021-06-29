@@ -71,3 +71,10 @@ conda install rmats
 conda install rmats2sashimiplot
 rmats.py --b1 CON.txt --b2 UPM.txt --gtf /HDD2T/eunji/micro/Homo_sapiens.GRCh38.99.gtf --od ./AS/ -t paired --readLength 151 --cstat 0.0001 --nthread 10 --tmp ./tmp/
 rmats2sashimiplot --b1 A1.bam,A2.bam,A3.bam --b2 B1.bam,B2.bam,B3.bam -t SE -e ./SE.MATS.JC.txt --l1 A --l2 B --exon_s 1 --intron_s 1 -o SE_plot
+
+#kallisto 
+cat config | while read id 
+do
+kallisto quant -i /home/eunji/ref/Homo_sapiens.GRCh38.cdna.all.idx -o ./${id} ${id}-R_1_val_1.fq.gz ${id}-R_2_val_2.fq.gz
+done
+
