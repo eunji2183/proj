@@ -65,3 +65,9 @@ do
     salmon quant -i ${salmon_index} -l A -1 ${fq1} -2 ${fq2} -o ./6.isoform/salmon/${id}_quant >> ./6.isoform/salmon/${id}_salmon.log 2>&1 
   echo "end salmon quant for ${id}" `date` 
 done 
+
+#rmats -sashimiplot 
+conda install rmats
+conda install rmats2sashimiplot
+rmats.py --b1 CON.txt --b2 UPM.txt --gtf /HDD2T/eunji/micro/Homo_sapiens.GRCh38.99.gtf --od ./AS/ -t paired --readLength 151 --cstat 0.0001 --nthread 10 --tmp ./tmp/
+rmats2sashimiplot --b1 A1.bam,A2.bam,A3.bam --b2 B1.bam,B2.bam,B3.bam -t SE -e ./SE.MATS.JC.txt --l1 A --l2 B --exon_s 1 --intron_s 1 -o SE_plot
