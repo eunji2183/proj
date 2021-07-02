@@ -78,3 +78,9 @@ do
 kallisto quant -i /home/eunji/ref/Homo_sapiens.GRCh38.cdna.all.idx -o ./${id} ${id}-R_1_val_1.fq.gz ${id}-R_2_val_2.fq.gz
 done
 
+#STAR-bamCoverage-MISO
+cat config | while read id 
+do
+STAR --readFilesIn ./2.clean_fq/${id}_1_val_1.fq ./2.clean_fq/${id}_2_val_2.fq --chimSegmentMin 2 --outFilterMismatchNmax 3 --alignEndsType EndToEnd --runThreadN 12 --outSAMstrandField intronMotif --outSAMtype BAM SortedByCoordinate --alignSJDBoverhangMin 6 --alignIntronMax 299999 --genomeDir /HDD8T/eunji/proj/STAR_index_GRCh38_gencode_v33_100 --sjdbGTFfile ./Homo_sapiens.GRCh38.99.gtf --outFileNamePrefix ${id}
+done
+
