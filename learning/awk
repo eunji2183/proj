@@ -102,4 +102,5 @@ awk 'NF'                # prints only nonempty lines (or: removes empty lines, w
 awk 'NF--'              # removes last field and prints the line
 
 
+cat CON1 | awk -v OFMT='%f' '{ SUM += $4} END { print SUM }'  # 1+10e , e remove 
 
