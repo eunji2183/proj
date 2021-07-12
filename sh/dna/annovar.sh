@@ -1,4 +1,16 @@
+#https://annovar.openbioinformatics.org/en/latest/user-guide/download/ 
 perl annotate_variation.pl -buildver hg19 -downdb -webfrom annovar clinvar_20210501 humandb/
+
+
+perl ./table_annovar.pl /HDD8T/eunji/proj/SVIL/sva67_koges100.vcf ./humandb/ \
+-buildver hg19 \
+-out /HDD8T/eunji/proj/SVIL/ \
+-remove \
+-protocol refGene,knownGene,snp138,clinvar_20210501,cosmic70 \
+-operation g,g,f,f,f \
+-nastring . -vcfinput
+
+
 
 #annovar annotation 
 
