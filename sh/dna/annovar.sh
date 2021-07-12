@@ -1,3 +1,5 @@
+perl annotate_variation.pl -buildver hg19 -downdb -webfrom annovar clinvar_20210501 humandb/
+
 #annovar annotation 
 
 cat config | while  read id
