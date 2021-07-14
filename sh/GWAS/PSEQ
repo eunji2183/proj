@@ -1,0 +1,55 @@
+http://statgen.us/files/tutorials/pseq/PSEQ_exercise.pdf
+
+#mkdir PSEQ
+#VCF file & phe file 
+
+pseq pseq new-project
+pseq pseq load-vcf --vcf anno3.vcf
+pseq pseq load-pheno --file phe.phe
+pseq pseq v-view | head
+pseq pseq i-view | head
+pseq pseq summary
+pseq pseq var-summary # Variant DB summary
+
+pseq pseq ind-summary   #Individual DB summary
+pseq pseq loc-summary
+pseq pseq ref-summary
+pseq pseq seq-summary
+pseq pseq file-summary
+pseq pseq meta-summary
+pseq pseq v-stats
+pseq pseq i-stats | head
+pseq pseq tag-file --id 1 --name KoGES
+pseq pseq tag-file --id 2 --name SVA
+pseq pseq var-summary
+pseq pseq v-freq | head
+pseq pseq v-freq --mask file=SVA | head 
+
+
+#Data Cleaning
+
+pseq pseq v-view --mask any.filter.ex | head
+pseq pseq v-view --mask any.filter.ex | wc -l
+pseq pseq var-set --group pass --mask any.filter.ex
+pseq pseq var-set --group pass_DP30 --mask include="DP>29" var=pass
+pseq pseq var-set --group pass_DP30_DPgeno20 --mask geno=DP:ge:21 var=pass_DP30
+
+#Exclude variant sites with HWE p-value < 5.7e-7
+pseq pseq var-set --group pass_DP30_DPgeno20_HWE --mask hwe=5.7e-7:1 var=pass_DP30_DPgeno20
+
+#extract variant sites with MAF ≥ 0.05
+pseq pseq var-set --group pass_DP30_DPgeno20_HWE_MAFgt05 --mask maf=0.05:0.5 var=pass_DP30_DPgeno20_HWE
+
+#extract variant sites with MAF ≤ 0.01
+pseq myproj var-set --group pass_DP30_DPgeno20_HWE_MAFlt01 --mask "mac=1 maf=0.01" var=pass_DP30_DPgeno20_HWE
+
+#Analysis of common variants (MAF ≥ 0.05)
+pseq pseq glm --phenotype SVAi --covar SEX Age BMI BMD  --mask var=pass_DP30_DPgeno20_HWE_MAFgt05 > SNV.result
+
+cat SNV.result | awk '{if(FNR==1) print $0; if(NR>1) print $0 | "sort -k9"}' | grep -v "NA\s\+NA\s\+NA" | head
+
+#Analysis of rare variants (MAF <0.01)
+pseq myproj assoc --tests skat --phenotype SVAi covar SEX --mask include="DP>29" geno=DP:ge:21 file=CEU hwe=5.7e-7:1 "mac=1 maf=0.01" loc.group=refseq > SKAT.result
+
+
+
