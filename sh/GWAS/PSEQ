@@ -35,7 +35,7 @@ pseq pseq var-set --group pass_DP30 --mask include="DP>29" var=pass
 pseq pseq var-set --group pass_DP30_DPgeno20 --mask geno=DP:ge:21 var=pass_DP30
 
 #Exclude variant sites with HWE p-value < 5.7e-7
-pseq pseq var-set --group pass_DP30_DPgeno20_HWE --mask hwe=5.7e-7:1 var=pass_DP30_DPgeno20
+pseq pseq var-set --group pass_DP30_DPgeno20_HWE --mask hwe=1e-3:1 var=pass_DP30_DPgeno20
 
 #extract variant sites with MAF ≥ 0.05
 pseq pseq var-set --group pass_DP30_DPgeno20_HWE_MAFgt05 --mask maf=0.05:0.5 var=pass_DP30_DPgeno20_HWE
