@@ -11,7 +11,11 @@ http://yulab-smu.top/clusterProfiler-book/chapter12.html #GO 그림그리기
 
 #rstudio path change 
 R_LIBS_USER="/home/eunji/R/x86_64-pc-linux-gnu-library/4.0"
-https://bookdown.org/content/6371/ #그림그리기 ggplot등등
 
 
 http://pcool.dyndns.org:8080/statsbook/?page_id=513 #survival plot 등 이쁘게 그려줌 !!!! 
+https://rstudio-pubs-static.s3.amazonaws.com/300535_2a8382af47714d0aaa3f4cce9a7645a3.html
+https://github.com/kassambara/survminer/issues/319
+https://www.themillerlab.io/post/survival_analysis/
+https://bookdown.org/content/6371/ #그림그리기 ggplot등등
+https://www.kaggle.com/saife245/r-challenge-of-100-visualization-in-r
