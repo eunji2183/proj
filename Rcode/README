@@ -24,3 +24,4 @@ http://www.sthda.com/english/articles/32-r-graphics-essentials/126-combine-multi
 http://www.lreding.com/nonstandard_deviations/2017/08/19/cowmarg/ #marginal plot 그리기 
 https://jokergoo.github.io/ComplexHeatmap-reference/book/more-examples.html #complexheatmap 옆의 annotation 등등
 https://martinctc.github.io/blog/vignette-generate-your-own-ggplot-theme-gallery/ #background theme 모음
+https://stackoverflow.com/questions/34211735/r-how-to-allocate-screen-space-to-complex-ggplot-images 
