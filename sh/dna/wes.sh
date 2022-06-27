@@ -1,3 +1,9 @@
+#conda env 
+conda create -n dna
+conda activate dna
+conda install bwa gatk4 fastqc multiqc trim-galore 
+
+
 ## WES
 mkdir biosoft project data
 cd project
