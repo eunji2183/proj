@@ -76,7 +76,7 @@ do
 		echo "start MarkDuplicates for ${id}" `date`
 		$GATK --java-options "-Xmx20G -Djava.io.tmpdir=./" MarkDuplicates \
 		-I ${BAM} \
-		--REMOVE_DUPLICATES=true \
+		--REMOVE_DUPLICATES true \
 		-O ./5.gatk/${id}_marked.bam \
 		-M ./5.gatk/${id}.metrics \
 		1>./5.gatk/${id}_log.mark 2>&1 
