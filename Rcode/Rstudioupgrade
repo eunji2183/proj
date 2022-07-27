@@ -1,0 +1,3 @@
+https://docs.rstudio.com/resources/install-r/#optional-install-multiple-versions-of-r #R version upgrade
+https://docs.rstudio.com/rsc/manual-install/#step-1-download-and-install  #rstudio connection 
+/etc/rstudio/rserver.conf > r-session-which 바꾸기 
