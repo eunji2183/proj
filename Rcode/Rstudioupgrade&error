@@ -6,3 +6,4 @@ https://docs.rstudio.com/rsc/manual-install/#step-1-download-and-install  #rstud
 https://stackoverflow.com/questions/16710047/usr-bin-ld-cannot-find-lnameofthelibrary # package download error (nlme) 
 yum provides */libquadmath.so
 sudo ln -s /usr/lib/gcc/x86_64-redhat-linux/4.8.2/libquadmath.so /usr/local/lib/libquadmath.so
+https://www.rstudio.com/products/rstudio/download-server/redhat-centos/
